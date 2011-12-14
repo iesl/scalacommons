@@ -1,4 +1,4 @@
-package com.davidsoergel.scalautils
+package edu.umass.cs.iesl.scalacommons
 
 object StringUtils {
   implicit def emptyStringToNone(s: String): Option[String] = {

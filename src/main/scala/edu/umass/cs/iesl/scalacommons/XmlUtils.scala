@@ -1,4 +1,4 @@
-package com.davidsoergel.scalautils
+package edu.umass.cs.iesl.scalacommons
 
 import _root_.javax.xml.parsers.SAXParser
 import xml.factory.XMLLoader
