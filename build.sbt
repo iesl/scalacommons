@@ -1,4 +1,4 @@
-name := "scalautils"
+name := "scalacommons"
 
 organization := "edu.umass.cs.iesl"
 
@@ -6,7 +6,17 @@ version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.9.1"
 
+resolvers += "David Soergel Repo" at "http://dev.davidsoergel.com/artifactory/repo"
+
+libraryDependencies += "com.davidsoergel" % "dsutils" % "1.03"
+
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.6.1" % "test"
+
+libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-core" % "0.2.0"
+
+libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-file" % "0.2.0"
+
+libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.9.1"
 
 publishTo <<= (version)
                                             {version: String =>
