@@ -22,6 +22,9 @@ object DateUtils {
       for (i <- 1 to 12) {
         result += i.toString -> (i - 1)
       }
+      for (i <- 1 to 9) {
+        result += ("0" + i.toString) -> (i - 1)
+      }
     }
     result.toMap
   }
@@ -30,3 +33,4 @@ object DateUtils {
 
   def parseMonthOneBased(s: String) = zeroBasedMonthsByName(s.trim) + 1
 }
+

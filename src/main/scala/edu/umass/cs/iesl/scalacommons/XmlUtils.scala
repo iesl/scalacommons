@@ -2,11 +2,66 @@ package edu.umass.cs.iesl.scalacommons
 
 import _root_.javax.xml.parsers.SAXParser
 import xml.factory.XMLLoader
-import xml.{parsing, Elem}
 import org.xml.sax.InputSource
-import java.io.File
 
-class XmlUtils {}
+import scala.xml._
+import collection.TraversableOnce
+import java.io.{InputStream, File}
+import io.BufferedSource
+
+
+object XmlUtils {
+
+  // http://stackoverflow.com/questions/8525675/how-to-get-a-streaming-iteratornode-from-a-large-xml-document
+  def processRecordsStreaming[T](input: InputStream)(f: Node => T) {
+    new scala.xml.parsing.ConstructingParser(new BufferedSource(input), false) {
+      nextch // initialize per documentation
+      document
+      // trigger parsing by requesting document
+
+      var depth = 0 // track depth
+
+      override def elemStart(pos: Int, pre: String, label: String,
+                             attrs: MetaData, scope: NamespaceBinding) {
+        super.elemStart(pos, pre, label, attrs, scope)
+        depth += 1
+      }
+
+      override def elemEnd(pos: Int, pre: String, label: String) {
+        depth -= 1
+        super.elemEnd(pos, pre, label)
+      }
+
+      override def elem(pos: Int, pre: String, label: String, attrs: MetaData,
+                        pscope: NamespaceBinding, nodes: NodeSeq): NodeSeq = {
+        val node: Node = super.elem(pos, pre, label, attrs, pscope, nodes).head
+        depth match {
+          case 1 => <dummy/> // dummy final roll up
+          case 2 => f(node); NodeSeq.Empty // process and discard first-level nodes
+          case _ => node // roll up other nodes
+        }
+      }
+    }
+  }
+
+  // http://stackoverflow.com/questions/3797699/generator-block-to-iterator-stream-conversion
+  def generatorToTraversable[T](func: (T => Unit) => Unit) = new Traversable[T] {
+    def foreach[X](f: T => X) {
+      func(f(_))
+    }
+  }
+
+  /*
+  The result of generatorToTraversable is not traversable more than once (even though a new ConstructingParser
+  is instantiated on each foreach call) because the input stream is a Source, which is an Iterator.
+  We can't override Traversable.isTraversableAgain because it's final.
+  Really we'd like to enforce this by just returning an Iterator.  However, both Traversable.toIterator and
+  Traversable.view.toIterator make an intermediate Stream, which will cache all the entries (defeating the
+  whole purpose of this exercise).  Oh well; just let the stream throw an exception if it's accessed twice.
+  Also note the whole thing isn't threadsafe.
+   */
+  def firstLevelNodes(input: InputStream): TraversableOnce[Node] = generatorToTraversable(processRecordsStreaming(input))
+}
 
 
 object XMLIgnoreDTD extends XMLLoader[Elem] {

@@ -3,6 +3,8 @@ package edu.umass.cs.iesl.scalacommons
 import scalax.io._
 import tools.nsc.io._
 import java.io.InputStream
+import com.weiglewilczek.slf4s.Logging
+import scala.util.Random
 
 /**
  * a File to operate on together with a temp directory.
@@ -17,30 +19,47 @@ trait Workspace {
   def clean()
 }
 
-class StreamWorkspace(val filename: String, instream: InputStream) extends Workspace {
-  lazy val dir = {
-    val dir = Directory.makeTemp()
-    val file = File(dir + File.separator + filename)
-    val outstream = file bufferedOutput (false)
+object TempDirFactory {
+  // this just recapitulates Directory.makeTemp, except that deleteOnExit can be disabled
+  def apply(): Directory = {
+    val jfile = java.io.File.createTempFile(Random.alphanumeric take 6 mkString, null, null)
+    // jfile.deleteOnExit()
+    val path = new File(jfile)
+    path.delete()
+    path.createDirectory()
+  }
+}
+
+class StreamWorkspace(val filename: String, instream: InputStream) extends Workspace with Logging {
+  val (dir, file) = {
+    val d = TempDirFactory() //Directory.makeTemp()
+    val f = File(d + File.separator + filename)
+    val outstream = f bufferedOutput (false)
     Resource.fromInputStream(instream) copyDataTo Resource.fromOutputStream(outstream)
     instream.close()
     outstream.close()
 
-    dir
+    logger.debug("Created StreamWorkspace in " + d + " containing " + f)
+    (d, f)
   }
 
-  lazy val file = File(dir + File.separator + filename)
+  //lazy val file = File(dir + File.separator + filename)
 
   def clean() {
     dir deleteRecursively()
   }
 }
 
-class FileWorkspace(val jfile: java.io.File) extends Workspace {
+class FileWorkspace(val jfile: java.io.File) extends Workspace with Logging {
   val file = File(jfile)
-  lazy val dir = Directory.makeTemp()
+  val dir = {
+    val d = TempDirFactory() //Directory.makeTemp()
+    logger.debug("Created FileWorkspace in " + d + " for " + file +
+      " " + d.isValid + " " + d.exists)
+    d
+  }
 
-  lazy val filename = file.name
+  val filename = file.name
   //lazy val file = File(dir + File.separator + filename)
   def clean() {
     dir deleteRecursively()

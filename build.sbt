@@ -6,11 +6,19 @@ version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.9.1"
 
+resolvers += "sbt-idea-repo" at "http://mpeltonen.github.com/maven/"
+
 resolvers += "David Soergel Repo" at "http://dev.davidsoergel.com/artifactory/repo"
 
 libraryDependencies += "com.davidsoergel" % "dsutils" % "1.03"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.6.1" % "test"
+
+libraryDependencies += "com.weiglewilczek.slf4s" %% "slf4s" % "1.0.7"
+
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "0.9.24"
+
+libraryDependencies += "ch.qos.logback" % "logback-core" % "0.9.24"
 
 libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-core" % "0.2.0"
 
