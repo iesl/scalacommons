@@ -20,7 +20,7 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "0.9.24"
 
 libraryDependencies += "ch.qos.logback" % "logback-core" % "0.9.24"
 
-libraryDependencies += "com.davidsoergel" % "dsutils" % "1.03"
+libraryDependencies += "com.davidsoergel" % "dsutils" % "1.04-SNAPSHOT"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.6.1" % "test"
 
