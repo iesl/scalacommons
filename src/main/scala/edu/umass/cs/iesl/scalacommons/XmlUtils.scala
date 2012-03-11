@@ -11,11 +11,27 @@ import io.BufferedSource
 
 
 object XmlUtils {
-  def descendantExcluding(node: Node, excludeLabels: Seq[String]): List[Node] =
-  {
-    node.child.toList.filter(c => !excludeLabels.contains(c.label)).flatMap { x => x::descendantExcluding (x,excludeLabels) }
-  }
 
+  /**
+   * All the text contained in a node, with no tags, but guaranteeing a space separating text bits that had a tag between them (e.g. blah<foo>bubba</foo>zimbob shourd give blah bubba zimbob, not blahbubbazimbob as node.text would have done.
+   * @param node
+   * @return
+   */
+  def spaceSeparatedText(node: Node): String = node.descendant.filter(_.isInstanceOf[Text]).map(_.text).mkString(" ").replaceAll("\\s|\"", " ").trim
+
+  /* {
+    // broken up for debugging
+    val parts: Seq[String] = node.descendant.filter(_.isInstanceOf[Text]).map(_.text)
+    val comb: String = parts.mkString(" ")
+    val s: String = comb.replaceAll("\\s|\"", " ").trim
+    s
+  }*/
+
+  def descendantExcluding(node: Node, excludeLabels: Seq[String]): List[Node] = {
+    node.child.toList.filter(c => !excludeLabels.contains(c.label)).flatMap {
+      x => x :: descendantExcluding(x, excludeLabels)
+    }
+  }
 
 
   // http://stackoverflow.com/questions/8525675/how-to-get-a-streaming-iteratornode-from-a-large-xml-document
@@ -75,7 +91,8 @@ object XmlUtils {
                         pscope: NamespaceBinding, nodes: NodeSeq): NodeSeq = {
         val node: Node = super.elem(pos, pre, label, attrs, pscope, nodes).head
         if (labels contains label) {
-          f(node); if (depth == 1) <dummy/> else NodeSeq.Empty
+          f(node);
+          if (depth == 1) <dummy/> else NodeSeq.Empty
         } else node
         /*
         depth match {
