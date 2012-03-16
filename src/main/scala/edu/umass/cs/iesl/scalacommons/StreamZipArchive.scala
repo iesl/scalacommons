@@ -1,4 +1,4 @@
-package edu.umass.cs.iesl.scalacommons.io
+package edu.umass.cs.iesl.scalacommons
 
 // copied from https://lampsvn.epfl.ch/trac/scala/browser/scala/trunk/src//compiler/scala/tools/nsc/io/ZipArchive.scala#L1
 // and adapted to StreamZipArchive
