@@ -10,8 +10,8 @@ object StringUtils {
 }
 
 class RichString(val s: String) {
-  def removeNewlines: String = s.replaceAll("[\\n\\r]*", " ")
-  def removePunctuation: String = s.replaceAll("\\p{Punct}*", " ")
-  def removeAllButWord: String = s.replaceAll("[^\\w\\s]*", " ")
-  def collapseWhitespace: String = s.replaceAll("\\s*", " ")
+  def removeNewlines: String = s.replaceAll("[\\n\\r]+", " ")
+  def removePunctuation: String = s.replaceAll("\\p{Punct}+", " ")
+  def removeAllButWord: String = s.replaceAll("[^\\w\\s]+", " ")
+  def collapseWhitespace: String = s.replaceAll("\\s+", " ")
 }
