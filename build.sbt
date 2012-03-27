@@ -10,9 +10,7 @@ resolvers += "sbt-idea-repo" at "http://mpeltonen.github.com/maven/"
 
 resolvers += "David Soergel Repo" at "http://dev.davidsoergel.com/artifactory/repo"
 
-resolvers += "IESL Repo" at "https://dev-iesl.cs.umass.edu/nexus/content/repositories/releases"
-
-resolvers += "IESL Snapshot Repo" at "https://dev-iesl.cs.umass.edu/nexus/content/repositories/snapshots"
+resolvers += "IESL Repo" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public"
 
 libraryDependencies += "com.weiglewilczek.slf4s" %% "slf4s" % "1.0.7"
 
@@ -33,22 +31,23 @@ libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.9.1"
 libraryDependencies += "org.clapper" %% "classutil" % "0.4.3"
 
 publishTo <<= (version)
-                                            {version: String =>
-                                              {
-                                              def repo(name: String) = name at "https://dev-iesl.cs.umass.edu/nexus/content/repositories/" + name
-                                              val isSnapshot = version.trim.endsWith("SNAPSHOT")
-                                              val repoName = if (isSnapshot) "snapshots" else "releases"
-                                              Some(repo(repoName))
-                                              }
-                                            }
+    {
+    version: String =>
+        {
+        def repo(name: String) = name at "https://dev-iesl.cs.umass.edu/nexus/content/repositories/" + name
+        val isSnapshot = version.trim.endsWith("SNAPSHOT")
+        val repoName = if (isSnapshot) "snapshots" else "releases"
+        Some(repo(repoName))
+        }
+    }
 
 credentials +=
-                                  {
-                                  Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match
-                                  {
-                                    case Seq(Some(user), Some(pass)) =>
-                                      Credentials("Sonatype Nexus Repository Manager", "dev-iesl.cs.umass.edu", user, pass)
-                                    case _ =>
-                                      Credentials(Path.userHome / ".ivy2" / ".credentials")
-                                  }
-                                  }
+    {
+    Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match
+        {
+        case Seq(Some(user), Some(pass)) =>
+            Credentials("Sonatype Nexus Repository Manager", "dev-iesl.cs.umass.edu", user, pass)
+        case _ =>
+            Credentials(Path.userHome / ".ivy2" / ".credentials")
+        }
+    }
