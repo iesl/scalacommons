@@ -1,0 +1,75 @@
+org.neo4j.server.database.location=data/graph.db
+# org.neo4j.server.webserver.port=7474
+# org.neo4j.server.webadmin.rrdb.location=data/graph.db/../rrd
+# REST endpoint for the data API
+# Note the / in the end is mandatory
+org.neo4j.server.webadmin.data.uri=/db/data/
+# REST endpoint of the administration API (used by Webadmin)
+org.neo4j.server.webadmin.management.uri=/db/manage/
+# Low-level graph engine tuning file
+# org.neo4j.server.db.tuning.properties=conf/neo4j.properties
+
+# DANGER! Only for testing environments:
+neo4j.destroy_on_startup=false
+neo4j.skip.shutdown.hook=false
+
+# neo4j.allow_store_upgrade
+# neo4j.array_block_size
+# neo4j.neostore.propertystore.db.arrays.mapped_memory
+# neo4j.backup_slave
+# neo4j.cache_type
+# neo4j.nioneodb
+# neo4j.dump_configuration
+# neo4j.enable_online_backup
+# neo4j.enable_remote_shell
+# neo4j.keep_logical_logs
+# neo4j.logical_log
+# neo4j.neo_store
+
+neo4j.node_auto_indexing=true
+neo4j.node_keys_indexable=name
+neo4j.relationship_auto_indexing=false
+# neo4j.relationship_keys_indexable
+
+# neo4j.neostore.nodestore.db.mapped_memory
+# neo4j.neostore.propertystore.db.index.keys.mapped_memory
+# neo4j.neostore.propertystore.db.index.mapped_memory
+# neo4j.neostore.propertystore.db.mapped_memory
+# neo4j.read_only
+# neo4j.rebuild_idgenerators_fast
+# neo4j.neostore.relationshipstore.db.mapped_memory
+# neo4j.store_dir
+# neo4j.string_block_size
+# neo4j.neostore.propertystore.db.strings.mapped_memory
+# neo4j.tx_manager_impl
+# neo4j.use_memory_mapped_buffers
+
+# neo4j.allow_store_upgrade
+# neo4j.array_block_size
+# neo4j.neostore.propertystore.db.arrays.mapped_memory
+# neo4j.backup_slave
+# neo4j.cache_type
+# neo4j.nioneodb
+# neo4j.dump_configuration
+# neo4j.enable_online_backup
+# neo4j.enable_remote_shell
+# neo4j.keep_logical_logs
+# neo4j.logical_log
+# neo4j.neo_store
+# neo4j.node_auto_indexing
+# neo4j.node_keys_indexable
+# neo4j.neostore.nodestore.db.mapped_memory
+# neo4j.neostore.propertystore.db.index.keys.mapped_memory
+# neo4j.neostore.propertystore.db.index.mapped_memory
+# neo4j.neostore.propertystore.db.mapped_memory
+# neo4j.read_only
+# neo4j.rebuild_idgenerators_fast
+# neo4j.relationship_auto_indexing
+# neo4j.relationship_keys_indexable
+# neo4j.neostore.relationshipstore.db.mapped_memory
+# neo4j.store_dir
+# neo4j.string_block_size
+# neo4j.neostore.propertystore.db.strings.mapped_memory
+# neo4j.tx_manager_impl
+# neo4j.use_memory_mapped_buffers
+

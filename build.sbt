@@ -6,29 +6,29 @@ version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.9.1"
 
-resolvers += "sbt-idea-repo" at "http://mpeltonen.github.com/maven/"
+resolvers ++= Seq(
+  "sbt-idea-repo" at "http://mpeltonen.github.com/maven/",
+  "David Soergel Repo" at "http://dev.davidsoergel.com/artifactory/repo",
+  "IESL Repo" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public"
+)
 
-resolvers += "David Soergel Repo" at "http://dev.davidsoergel.com/artifactory/repo"
-
-resolvers += "IESL Repo" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public"
-
-libraryDependencies += "com.weiglewilczek.slf4s" %% "slf4s" % "1.0.7"
-
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "0.9.24"
-
-libraryDependencies += "ch.qos.logback" % "logback-core" % "0.9.24"
-
-libraryDependencies += "com.davidsoergel" % "dsutils" % "1.04-SNAPSHOT"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "1.6.1" % "test"
-
-libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-core" % "0.2.0"
-
-libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-file" % "0.2.0"
-
-libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.9.1"
-
-libraryDependencies += "org.clapper" %% "classutil" % "0.4.3"
+libraryDependencies ++= Seq(
+  "ch.qos.logback"                % "logback-classic"    % "0.9.24",
+  "ch.qos.logback"                % "logback-core"       % "0.9.24",
+  "com.davidsoergel"              % "dsutils"            % "1.04-SNAPSHOT",
+  "com.github.scala-incubator.io" %% "scala-io-core"     % "0.2.0",
+  "com.github.scala-incubator.io" %% "scala-io-file"     % "0.2.0",
+  "com.weiglewilczek.slf4s"       %% "slf4s"             % "1.0.7",
+  "commons-io"                    %  "commons-io"        %  "2.0.1",
+  "net.databinder"                %% "dispatch-core"     %  "0.8.7",
+  "net.databinder"                %% "dispatch-http"     %  "0.8.7",
+  "org.clapper"                   %% "classutil"         % "0.4.3",
+  "org.jdom"                      %  "jdom"              %  "1.1",
+  "org.scala-lang"                % "scala-compiler"     % "2.9.1",
+  "org.scalatest"                 %% "scalatest"         % "1.6.1" % "test",
+  "org.scalaz"                    %% "scalaz-core"       %  "6.0.4",
+  "org.specs2"                    %% "specs2"            %  "1.7.1"  %  "test"
+)
 
 publishTo <<= (version)
     {
