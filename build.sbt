@@ -15,7 +15,7 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   "ch.qos.logback"                % "logback-classic"    % "0.9.24",
   "ch.qos.logback"                % "logback-core"       % "0.9.24",
-  "com.davidsoergel"              % "dsutils"            % "1.04-SNAPSHOT",
+  "com.davidsoergel"              % "dsutils"            % "1.04-SNAPSHOT" exclude("commons-logging", "commons-logging"),
   "com.github.scala-incubator.io" %% "scala-io-core"     % "0.2.0",
   "com.github.scala-incubator.io" %% "scala-io-file"     % "0.2.0",
   "com.weiglewilczek.slf4s"       %% "slf4s"             % "1.0.7",

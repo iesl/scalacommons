@@ -3,105 +3,139 @@ package edu.umass.cs.iesl.scalacommons.collections
 import collection.mutable.HashMap
 import collection.{Map, Seq}
 
-object WeightedSet {
-  def apply[T](x: Seq[Tuple2[T, Double]]): WeightedSet[T] = {
-    new WeightedSet[T] {
-      val asMap = Map() ++ x.toMap
-    }
-  }
-}
+object WeightedSet
+	{
+	def apply[T](x: Seq[Tuple2[T,Double]]): WeightedSet[T] =
+		{
+		new WeightedSet[T]
+			{
+			val asMap = Map[T, Double]() ++ x.toMap
+			}
+		}
 
-class Tuple2DoubleValueOrdering[T] extends Ordering[Tuple2[T, Double]] {
-  def compare(x: (T, Double), y: (T, Double)) = (y._2.compare(x._2))
-}
+	def fromFloat[T](x: Seq[Tuple2[T,Float]]): WeightedSet[T] =
+		{
+		new WeightedSet[T]
+			{
+			val asMap = Map[T, Double]() ++ x.toMap.mapValues(d => d.toDouble)
+			}
+		}
+	}
 
-trait WeightedSet[T] {
-  def mapLabels(map: Map[T, T]) = {
-    val result = MutableWeightedSet[T]()
-    for ((from, score) <- asMap) {
-      map.get(from).map(to => result.incrementBy(to, score)).getOrElse(result.incrementBy(from, score))
-    }
-    result
-  }
+class Tuple2DoubleValueOrdering[T] extends Ordering[Tuple2[T, Double]]
+	{
+	def compare(x: (T, Double), y: (T, Double)) = (y._2.compare(x._2))
+	}
 
+trait WeightedSet[T]
+	{
+	def mapLabels(map: Map[T, T]) =
+		{
+		val result = MutableWeightedSet[T]()
+		for ((from, score) <- asMap)
+			{
+			map.get(from).map(to => result.incrementBy(to, score)).getOrElse(result.incrementBy(from, score))
+			}
+		result
+		}
 
-  def asMap: collection.Map[T, Double]
+	def asMap: collection.Map[T, Double]
 
-  def apply(v: T): Double = asMap.getOrElse(v, 0)
+	def apply(v: T): Double = asMap.getOrElse(v, 0)
 
-  // don't make this a lazy val because the impl could be mutable
-  def byWeight = asMap.toSeq.sorted(new Tuple2DoubleValueOrdering[T])
+	// don't make this a lazy val because the impl could be mutable
+	def byWeight = asMap.toSeq.sorted(new Tuple2DoubleValueOrdering[T])
 
-  def best: Option[T] = {
-    if (asMap.isEmpty)
-      None
-    else
-      Some(byWeight.head._1)
-  }
+	def best: Option[T] =
+		{
+		if (asMap.isEmpty)
+			None
+		else
+			Some(byWeight.head._1)
+		}
 
-  def unambiguousBest(secondBestRatioThreshold: Double): Option[T] = {
-    if (asMap.isEmpty)
-      None
-    else if (asMap.size == 1) {
-      val p: (T, Double) = asMap.head
-      if (p._2 <= 0) None
-      else Some(p._1)
-    }
-    else {
-      val w = byWeight;
-      val w1 = w.head._2
-      val w2 = w.tail.head._2
-      if (w2 / w1 <= secondBestRatioThreshold) {
-        Some(byWeight.head._1)
-      }
-      else None
-    }
-  }
+	def unambiguousBest(secondBestRatioThreshold: Double): Option[T] =
+		{
+		if (asMap.isEmpty)
+			None
+		else if (asMap.size == 1)
+			{
+			val p: (T, Double) = asMap.head
+			if (p._2 <= 0) None
+			else Some(p._1)
+			}
+		else
+			{
+			val w = byWeight;
+			val w1 = w.head._2
+			val w2 = w.tail.head._2
+			if (w2 / w1 <= secondBestRatioThreshold)
+				{
+				Some(byWeight.head._1)
+				}
+			else None
+			}
+		}
 
-  def mkString(sep: String) = asSeq.mkString(sep)
+	def mkString(sep: String) = asSeq.mkString(sep)
 
-  def normalized: WeightedSet[T] = {
-    val positiveOnly = asMap.filter(t => (t._2 > 0))
-    val c = positiveOnly.values.sum
-    def normalize(x: (T, Double)) = (x._1, x._2 / c)
+	def normalized: WeightedSet[T] =
+		{
+		val positiveOnly = asMap.filter(t => (t._2 > 0))
+		val c = positiveOnly.values.sum
+		def normalize(x: (T, Double)) = (x._1, x._2 / c)
 
-    val result = WeightedSet[T](positiveOnly.map(normalize).toSeq)
-    result
-  }
+		//val result = WeightedSet[T,Double](positiveOnly.map(normalize).toSeq)
+		//result
 
-  def asSeq: Seq[(T, Double)] = asMap.toSeq.sortBy(_._2).reverse
+		new WeightedSet[T]
+			{
+			val asMap = positiveOnly.map(normalize)
+			}
+		}
 
-  override def toString = asSeq.toString()
+	def asSeq: Seq[(T, Double)] = asMap.toSeq.sortBy(_._2).reverse
 
-  def |+|(that: WeightedSet[T]): WeightedSet[T] = {
-    // merge the maps
-    // could use scalaz: asMap |+| that.asMap
-    // for that matter WeightedSet should extend Semigroup...
-    val newMap: Map[T, Double] = asMap ++ that.asMap.map {
-      case (k, v) => k -> (v + asMap.getOrElse(k, 0.0))
-    }
+	override def toString = asSeq.toString()
 
-    new WeightedSet[T]() {
-      override val asMap = newMap
-    }
-  }
-}
+	def |+|(that: WeightedSet[T]): WeightedSet[T] =
+		{
+		// merge the maps
+		// could use scalaz: asMap |+| that.asMap
+		// for that matter WeightedSet should extend Semigroup...
+		val newMap: Map[T, Double] = asMap ++ that.asMap.map
+		                                      {
+		                                      case (k, v) => k -> (v + asMap.getOrElse(k, 0.0))
+		                                      }
 
-object MutableWeightedSet {
-  def apply[T](): MutableWeightedSet[T] = {
-    new MutableWeightedSet[T] {
-      val asMap = new HashMap[T, Double]() {
-        override def default(key: T) = 0
-      }
-    }
-  }
-}
+		new WeightedSet[T]()
+			{
+			override val asMap = newMap
+			}
+		}
+	}
 
-trait MutableWeightedSet[T] extends WeightedSet[T] {
-  override def asMap: collection.mutable.Map[T, Double]
+object MutableWeightedSet
+	{
+	def apply[T](): MutableWeightedSet[T] =
+		{
+		new MutableWeightedSet[T]
+			{
+			val asMap = new HashMap[T, Double]()
+				{
+				override def default(key: T) = 0
+				}
+			}
+		}
+	}
 
-  def incrementBy(v: T, d: Double) {
-    val cur: Double = asMap.getOrElse(v, 0) // the else case should never fire because of the default
-    asMap.update(v, cur + d)
-  }
-}
+trait MutableWeightedSet[T] extends WeightedSet[T]
+	{
+	override def asMap: collection.mutable.Map[T, Double]
+
+	def incrementBy(v: T, d: Double)
+		{
+		val cur: Double = asMap.getOrElse(v, 0) // the else case should never fire because of the default
+		asMap.update(v, cur + d)
+		}
+	}
