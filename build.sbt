@@ -19,15 +19,16 @@ libraryDependencies ++= Seq(
   "com.github.scala-incubator.io" %% "scala-io-core"     % "0.2.0",
   "com.github.scala-incubator.io" %% "scala-io-file"     % "0.2.0",
   "com.weiglewilczek.slf4s"       %% "slf4s"             % "1.0.7",
-  "commons-io"                    %  "commons-io"        %  "2.0.1",
-  "net.databinder"                %% "dispatch-core"     %  "0.8.7",
-  "net.databinder"                %% "dispatch-http"     %  "0.8.7",
+  "commons-io"                    %  "commons-io"        % "2.0.1",
+  "net.databinder"                %% "dispatch-core"     % "0.8.7",
+  "net.databinder"                %% "dispatch-http"     % "0.8.7",
   "org.clapper"                   %% "classutil"         % "0.4.3",
-  "org.jdom"                      %  "jdom"              %  "1.1",
-  "org.scala-lang"                % "scala-compiler"     % "2.9.1",
-  "org.scalatest"                 %% "scalatest"         % "1.6.1" % "test",
-  "org.scalaz"                    %% "scalaz-core"       %  "6.0.4",
-  "org.specs2"                    %% "specs2"            %  "1.7.1"  %  "test"
+  "org.jdom"                      %  "jdom"              % "1.1",
+  "jaxen"                         %  "jaxen"             % "1.1.1",
+  "org.scala-lang"                %  "scala-compiler"    % "2.9.1",
+  "org.scalatest"                 %% "scalatest"         % "1.6.1"   %  "test",
+  "org.scalaz"                    %% "scalaz-core"       % "6.0.4",
+  "org.specs2"                    %% "specs2"            % "1.7.1"   %  "test"
 )
 
 publishTo <<= (version)
