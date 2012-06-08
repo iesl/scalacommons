@@ -9,7 +9,7 @@ scalaVersion := "2.9.1"
 resolvers ++= Seq(
   "sbt-idea-repo" at "http://mpeltonen.github.com/maven/",
   "David Soergel Repo" at "http://dev.davidsoergel.com/nexus/content/groups/public",
-  "David Soergel Snapshots" at "http://dev.davidsoergel.com/nexus/content/groups/snapshots",
+  "David Soergel Snapshots" at "http://dev.davidsoergel.com/nexus/content/repositories/snapshots",
   "IESL Repo" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public"
 )
 
