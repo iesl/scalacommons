@@ -13,6 +13,9 @@ object FileOps {
   import scala.io.Source
   import scala.io.BufferedSource
 
-  def reSource[A](cls:Class[A], path:String): BufferedSource = Source.fromURL(cls.getResource(path))
+  def getResource[A](cls:Class[A], path:String) = cls.getResource(path)
+  def getResourceStream[A](cls:Class[A], path:String) = cls.getResourceAsStream(path)
+  def getResourceSource[A](cls:Class[A], path:String) = scala.io.Source.fromInputStream(getResourceStream(cls, path))
+  def getResourceFile[A](cls:Class[A], path:String) = new java.io.File(getResource(cls, path).toURI())
 
 }
