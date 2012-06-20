@@ -34,7 +34,6 @@ case class NonemptyString(s: String)
 
 	override def toString = s
 
-	// make equality depend only on the rectangle, so that there is only one representative at a time in the priority queue.
 	override def equals(other: Any): Boolean = other match
 	{
 		case that: NonemptyString => this.s == that.s
