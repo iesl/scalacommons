@@ -1,3 +1,5 @@
+import Dependencies._
+
 name := "scalacommons"
 
 organization := "edu.umass.cs.iesl"
@@ -7,29 +9,28 @@ version := "0.1-SNAPSHOT"
 scalaVersion := "2.9.1"
 
 resolvers ++= Seq(
-  "sbt-idea-repo" at "http://mpeltonen.github.com/maven/",
-  "David Soergel Repo" at "http://dev.davidsoergel.com/nexus/content/groups/public",
-  "David Soergel Snapshots" at "http://dev.davidsoergel.com/nexus/content/repositories/snapshots",
-  "IESL Repo" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public"
+  "IESL Repo" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public",
+  "IESL Repo" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public-snapshots"
 )
 
 libraryDependencies ++= Seq(
-  "ch.qos.logback"                % "logback-classic"    % "0.9.24",
-  "ch.qos.logback"                % "logback-core"       % "0.9.24",
+  "ch.qos.logback"                % "logback-classic"    % "1.0.6",
+  "ch.qos.logback"                % "logback-core"       % "1.0.6",
   "com.davidsoergel"              % "dsutils"            % "1.04-SNAPSHOT" exclude("commons-logging", "commons-logging"),
-  "com.github.scala-incubator.io" %% "scala-io-core"     % "0.2.0",
-  "com.github.scala-incubator.io" %% "scala-io-file"     % "0.2.0",
-  "com.weiglewilczek.slf4s"       %% "slf4s"             % "1.0.7",
-  "commons-io"                    %  "commons-io"        % "2.0.1",
-  "net.databinder"                %% "dispatch-core"     % "0.8.7",
-  "net.databinder"                %% "dispatch-http"     % "0.8.7",
-  "org.clapper"                   %% "classutil"         % "0.4.3",
-  "org.jdom"                      %  "jdom"              % "1.1",
-  "jaxen"                         %  "jaxen"             % "1.1.1",
+  "com.weiglewilczek.slf4s"       % "slf4s_2.9.1"        % "1.0.7",
+  "commons-io"                    %  "commons-io"        % "2.3",
+  "net.databinder"                %% "dispatch-core"     % "0.8.8",
+  "net.databinder"                %% "dispatch-http"     % "0.8.8",
+  "org.clapper"                   %% "classutil"         % "0.4.6",
   "org.scala-lang"                %  "scala-compiler"    % "2.9.1",
-  "org.scalatest"                 %% "scalatest"         % "1.6.1"   %  "test",
+  "org.scalatest"                 %% "scalatest"         % "1.8" % "test",
   "org.scalaz"                    %% "scalaz-core"       % "6.0.4",
-  "org.specs2"                    %% "specs2"            % "1.7.1"   %  "test"
+  "org.specs2"                    %% "specs2"            % "1.11" % "test",
+  "com.github.scala-incubator.io" %% "scala-io-core"     % "0.4.0",
+  "com.github.scala-incubator.io" %% "scala-io-file"     % "0.4.0",
+  "org.jdom"                      %  "jdom"              % "2.0.2",
+  mavenCobertura,
+  mavenFindbugs
 )
 
 publishTo <<= (version)

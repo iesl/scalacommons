@@ -1,4 +1,4 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 #
 # A more capable sbt runner, coincidentally also called sbt.
 # Author: Paul Phillips <paulp@typesafe.com>
@@ -25,7 +25,7 @@ get_mem_opts () {
   (( $perm > 256 )) || perm=256
   (( $perm < 1024 )) || perm=1024
   local codecache=$(( $perm / 8 ))
-  
+
   echo "-Xms${mem}m -Xmx${mem}m -XX:MaxPermSize=${perm}m -XX:ReservedCodeCacheSize=${codecache}m"
 }
 
@@ -144,7 +144,7 @@ jar_file () {
 sbt_artifactory_list () {
   local type="$1" # -RC or -SNAPSHOT
   local version=${sbt_version%-SNAPSHOT}
-  
+
   curl -s --list-only "$sbt_snapshot_baseurl" | \
     grep -F $version | \
     perl -e 'print reverse <>' | \
@@ -167,7 +167,7 @@ sbt_snapshot_actual_version () {
 download_url () {
   local url="$1"
   local jar="$2"
-  
+
   echo "Downloading sbt launcher $sbt_version:"
   echo "  From  $url"
   echo "    To  $jar"
@@ -187,7 +187,7 @@ acquire_sbt_jar () {
   elif [[ ! $sbt_version ]]; then
     sbt_version=$sbt_release_version
   fi
-  
+
   sbt_url="$(jar_url)"
   sbt_jar="$(jar_file $sbt_version)"
 
@@ -292,10 +292,10 @@ process_args ()
               *) addResidual "$1"; shift ;;
     esac
   done
-  
+
   [[ $debug ]] && {
     case "$sbt_version" in
-      0.7*) addSbt "debug" ;; 
+      0.7*) addSbt "debug" ;;
          *) addSbt "set logLevel in Global := Level.Debug" ;;
     esac
   }
