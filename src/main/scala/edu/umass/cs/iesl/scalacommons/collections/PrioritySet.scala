@@ -2,32 +2,30 @@ package edu.umass.cs.iesl.scalacommons.collections
 
 import scala.annotation.tailrec
 import edu.umass.cs.iesl.scalacommons.InvalidatableMemoize1
-import scala.collection.mutable.{Set, HashSet, PriorityQueue}
 import scala._
+import collection.mutable
 
 /**
  * @author <a href="mailto:dev@davidsoergel.com">David Soergel</a>
  * @version $Id$
  */
-class PrioritySet[A](override val ord: Ordering[A]) extends PriorityQueue[A]()(ord)
-	{
-	// some other data structure might be more efficient, but the redundant solution is quick and easy for now
-	protected val elementSet: Set[A] = HashSet[A]()
+class PrioritySet[A](override val ord: Ordering[A]) extends mutable.PriorityQueue[A]()(ord) {
+  // some other data structure might be more efficient, but the redundant solution is quick and easy for now
+  protected val elementSet: mutable.Set[A] = mutable.HashSet[A]()
 
-	override def +=(elem: A): this.type =
-		{
-		if (!elementSet.contains(elem))
-			{elementSet += elem; super.+=(elem)}
-		else this
-		}
+  override def +=(elem: A): this.type = {
+    if (!elementSet.contains(elem)) {
+      elementSet += elem; super.+=(elem)
+    }
+    else this
+  }
 
-	override def dequeue(): A =
-		{
-		val a = super.dequeue();
-		elementSet.remove(a);
-		a
-		}
-	}
+  override def dequeue(): A = {
+    val a = super.dequeue()
+    elementSet.remove(a)
+    a
+  }
+}
 
 /*
 trait ConditionalPrioritySet[A] extends PrioritySet[A]
@@ -46,25 +44,22 @@ trait ConditionalPrioritySet[A] extends PrioritySet[A]
  * Instead of an ordering, provide a function that computes a comparable priority value.  Priority values must remain stable,
  * so we cache them internally.
  */
-class MemorizedPriorityOrdering[A, P <: Ordered[P]](priority: (A) => P) extends Ordering[A]
-	{
-	val mpriority = InvalidatableMemoize1(priority)
+class MemorizedPriorityOrdering[A, P <: Ordered[P]](priority: (A) => P) extends Ordering[A] {
+  val mpriority = InvalidatableMemoize1[A, P](priority)
 
-	def compare(x: A, y: A) = mpriority(x).compare(mpriority(y))
-	}
+  def compare(x: A, y: A) = mpriority(x).compare(mpriority(y))
+}
 
 // this just serves to make the mpo available to subclasses
 class MemorizedPrioritySet[A, P <: Ordered[P]](val mpo: MemorizedPriorityOrdering[A, P]) extends PrioritySet[A](mpo)
 
-class ComputedPrioritySet[A, P <: Ordered[P]](priority: (A => P)) extends MemorizedPrioritySet[A, P](new MemorizedPriorityOrdering(priority))
-	{
-	override def dequeue(): A =
-		{
-		val a = super.dequeue()
-		mpo.mpriority.remove(a) // no need to remember priorities for dequeued items
-		a
-		}
-	}
+class ComputedPrioritySet[A, P <: Ordered[P]](priority: (A => P)) extends MemorizedPrioritySet[A, P](new MemorizedPriorityOrdering(priority)) {
+  override def dequeue(): A = {
+    val a: A = super.dequeue()
+    mpo.mpriority.remove(a) // no need to remember priorities for dequeued items
+    a
+  }
+}
 
 /**
  * If the priority for a given item may become invalid, but the only alterations allowed to priorities decrease them,
@@ -72,29 +67,25 @@ class ComputedPrioritySet[A, P <: Ordered[P]](priority: (A => P)) extends Memori
  * Caching is managed internally, so don't pass a memoized priority function!
  */
 class LazyRecomputingPrioritySet[A, P <: Ordered[P]](priority: (A => P), priorityIsValid: (A => Boolean))
-		extends MemorizedPrioritySet[A, P](new MemorizedPriorityOrdering(priority))
-	{
-	@tailrec
-	override final def dequeue(): A =
-		{
-		val a = super.dequeue()
+  extends MemorizedPrioritySet[A, P](new MemorizedPriorityOrdering(priority)) {
+  @tailrec
+  override final def dequeue(): A = {
+    val a = super.dequeue()
 
-		val p = mpo.mpriority.remove(a) // always forget a cached priority upon dequeuing, since it is either invalid or no longer needed anyway
+    val p = mpo.mpriority.remove(a) // always forget a cached priority upon dequeuing, since it is either invalid or no longer needed anyway
 
-		if (priorityIsValid(a))
-			{
-			a
-			}
-		else
-			{
-			// re-enqueue this item; its priority was just forgotten so it will be automatically recomputed
-			this += a
+    if (priorityIsValid(a)) {
+      a
+    }
+    else {
+      // re-enqueue this item; its priority was just forgotten so it will be automatically recomputed
+      this += a
 
-			// take the new best item
-			dequeue()
-			}
-		}
-	}
+      // take the new best item
+      dequeue()
+    }
+  }
+}
 
 /*
 /**
