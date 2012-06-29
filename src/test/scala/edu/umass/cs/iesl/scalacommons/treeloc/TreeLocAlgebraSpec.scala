@@ -6,8 +6,8 @@ import org.specs2.mutable
 import scalaz._, scalaz.{Scalaz => Z}, Z.{node => _, _}
 
 
-import edu.umass.cs.iesl.scalacommons.util.{StringOps, FileOps}
-import edu.umass.cs.iesl.scalacommons.layout.boxter.Boxes
+import util.{StringOps, FileOps}
+import layout.boxter.Boxes
 
 import StringOps._
 import FileOps._
@@ -15,7 +15,7 @@ import Boxes._
 
 
 object TreeLocAlgebraSpec extends mutable.Specification {
-  import TreeLocDrawing._  
+/* import TreeLocDrawing._
   import TreeLocUtils._
 
   "combining two treelocs" should {
@@ -45,5 +45,5 @@ object TreeLocAlgebraSpec extends mutable.Specification {
 
       todo
     }
-  }
+  }*/
 }

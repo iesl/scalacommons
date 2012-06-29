@@ -41,10 +41,8 @@
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/testing_2.9.1-0.11.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/actions_2.9.1-0.11.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/jsch-0.1.31.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.9.1/sbt_0.11.2/com.eed3si9n/sbt-assembly/jars/sbt-assembly-0.7.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/tracking_2.9.1-0.11.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/process_2.9.1-0.11.2.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.9.1/sbt_0.11.2/com.github.mpeltonen/sbt-idea/jars/sbt-idea-0.11.0.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/cache_2.9.1-0.11.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/test-interface-0.5.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/lib/scala-library.jar!/" />
@@ -52,12 +50,14 @@
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/task-system_2.9.1-0.11.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/sbt_2.9.1-0.11.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/control_2.9.1-0.11.2.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.9.1/sbt_0.11.2/com.eed3si9n/sbt-inspectr/jars/sbt-inspectr-0.0.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/launcher-interface_2.9.1-0.11.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/lib/jline.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/ivy_2.9.1-0.11.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/sbinary_2.9.0-0.4.0.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/tasks_2.9.1-0.11.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/xsbti/interface-0.11.2.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.9.1/sbt_0.11.2/com.github.mpeltonen/sbt-idea/jars/sbt-idea-1.0.0.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/classpath_2.9.1-0.11.2.jar!/" />
         </CLASSES>
         <JAVADOC />

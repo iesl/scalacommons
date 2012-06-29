@@ -14,7 +14,7 @@ import Boxes._
 
 
 object TreeLocDrawingSpec extends mutable.Specification {
-  import TreeLocDrawing._
+/*  import TreeLocDrawing._
 
   "treeloc drawing" should {
     "render all treelocs like so" in {
@@ -30,7 +30,7 @@ object TreeLocDrawingSpec extends mutable.Specification {
       |     │   └ 4     │   └ 4     │   └ 4     │   └ 4     │   └ 4     │   └ 4     │   └ 4     │   └─4     │   ┗━4     ┃   └ 4|
       |     └ 5         └─5         └─5         └─5         └─5         └─5         └─5         └─5         └─5         ┗━5    |
       """)
-      
+
       val tree = 0.node(1.node(2.node(3.leaf, 6.leaf), 4.leaf, 8.node(3.leaf, 4.leaf)), 5.leaf)
       val treeOfTreeLocs = tree.loc.cojoin.toTree
       val row = treeOfTreeLocs.flatten.foldl(text("")) { case (acc, tl) => {
@@ -45,5 +45,5 @@ object TreeLocDrawingSpec extends mutable.Specification {
 
       trimmed must_== renderedTreeLocs
     }
-  }
+  }*/
 }
