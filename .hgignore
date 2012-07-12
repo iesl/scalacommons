@@ -13,37 +13,38 @@ syntax: glob
 .DS_Store
 .\#*
 .manager
-.svn
 class
 log
-semantic.cache
+*.cache
 unpack
 
-## 
-## hgignore-vcs
+## CVS & SVN
 CVS
 .cvsignore
+.svn
 
-## 
+##
 ## ignore eclipse/idea/ensime
 .project
 .classpath
 .settings
 .distfiles
 .ensime
+.scala_dependencies
 
-## ignore sbt
+# Intellij IDEA files
+syntax: glob
+.idea/
+*.iml
+*.ipr
+*.iws
+
+## sbt build directories
 .lib/
 lib_managed/
 src_managed/
 target/
 project/boot/
-project/build/target/
-project/plugins/target/
-project/plugins/lib_managed/
-project/plugins/src_managed/
-
-
 
 
 

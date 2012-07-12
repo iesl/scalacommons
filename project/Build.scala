@@ -1,12 +1,13 @@
 import sbt._
-import sbt.Keys._
-import Dependencies._
+import edu.umass.cs.iesl.sbtbase.IeslProject
+import edu.umass.cs.iesl.sbtbase.IeslProject._
+import edu.umass.cs.iesl.sbtbase.Dependencies._
 
 object ScalaCommonsBuild extends Build {
 
   val vers = "0.1-SNAPSHOT"
 
-  val deps = libraryDependencies ++= Seq(
+  val deps = Seq(
     logbackClassic(),
     logbackCore(),
     slf4s(),
@@ -25,16 +26,7 @@ object ScalaCommonsBuild extends Build {
     mavenCobertura(),
     mavenFindbugs())
 
-  lazy val scalacommons = Project("scalacommons", file("."))
-    .settings(scalaSettings: _*)
-    .settings(resolvers ++= IESLRepos)
-    .settings(//name := "scalacommons",
-    organization := iesl,
-    version := vers,
-    scalaVersion := scalaV,
-    deps,
-    publishToIesl(vers, Public),
-    creds
-  )
+
+  lazy val scalacommons = IeslProject("scalacommons", vers, deps, Public)
 
 }
