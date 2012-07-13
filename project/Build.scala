@@ -1,11 +1,14 @@
 import sbt._
-import edu.umass.cs.iesl.sbtbase.IeslProject
+import edu.umass.cs.iesl.sbtbase.{CleanLogging, Dependencies, IeslProject}
 import edu.umass.cs.iesl.sbtbase.IeslProject._
-import edu.umass.cs.iesl.sbtbase.Dependencies._
 
 object ScalaCommonsBuild extends Build {
 
   val vers = "0.1-SNAPSHOT"
+
+  val allDeps = new Dependencies(CleanLogging.excludeLoggers)
+
+  import allDeps._
 
   val deps = Seq(
     logbackClassic(),
@@ -24,7 +27,7 @@ object ScalaCommonsBuild extends Build {
     scalaIoFile(),
     jdom("1.1.3"),
     mavenCobertura(),
-    mavenFindbugs())
+    mavenFindbugs()) ++ standardLogging
 
 
   lazy val scalacommons = IeslProject("scalacommons", vers, deps, Public)

@@ -18,129 +18,110 @@ import tools.nsc.util.ScalaClassLoader.URLClassLoader
  * Manages a set of plugins, which must be objects.
  * B is a base type from which all plugins must inherit.  This just makes classpath scanning more efficient; use Any if you don't care
  */
-class PluginManager[B <: PluginManager.HasName](implicit man: Manifest[B]) extends Logging
-	{
+class PluginManager[B <: PluginManager.HasName](implicit man: Manifest[B]) extends Logging {
 
-	private val pluginBaseName = man.toString
+  private val pluginBaseName = man.toString
 
-	val classpathFiles: Seq[File] =
-		{
-		val pluginClasspath = (new SystemProperties)("PluginClasspath")
-		if (pluginClasspath != null && !pluginClasspath.isEmpty())
-			{
-			pluginClasspath.split(";").map(new File(_))
-			}
-		else Nil
-		}
+  val classpathFiles: Seq[File] = {
+    val pluginClasspath = (new SystemProperties)("PluginClasspath")
+    if (pluginClasspath != null && !pluginClasspath.isEmpty()) {
+      pluginClasspath.split(";").map(new File(_))
+    }
+    else Nil
+  }
 
-	lazy val allClasses: Map[String, ClassInfo] =
-		{
-		lazy val urls = java.lang.Thread.currentThread.getContextClassLoader match
-		{
-			case cl: java.net.URLClassLoader => cl.getURLs.toList
-			case _                           => error("classloader is not a URLClassLoader")
-		}
+  lazy val allClasses: Map[String, ClassInfo] = {
+    lazy val urls = java.lang.Thread.currentThread.getContextClassLoader match {
+      case cl: java.net.URLClassLoader => cl.getURLs.toList
+      case _ => sys.error("classloader is not a URLClassLoader")
+    }
 
-		lazy val classpath =
-			{
-			val r: Seq[File] = urls map (_.toURI) map (new File(_))
-			//logger.info("LOCAL CLASSPATH: " + r.map(_.toString).mkString("\n"))
-			val x = (new SystemProperties)("java.class.path").split(";").map(new File(_)).toSeq
-			//logger.info("SYSTEM CLASSPATH: " + x.map(_.toString).mkString("\n"))
-			val xxx = r ++ x
-			val all = xxx.toSet[File]
-			all
-			}
+    lazy val classpath = {
+      val r: Seq[File] = urls map (_.toURI) map (new File(_))
+      //logger.info("LOCAL CLASSPATH: " + r.map(_.toString).mkString("\n"))
+      val x = (new SystemProperties)("java.class.path").split(";").map(new File(_)).toSeq
+      //logger.info("SYSTEM CLASSPATH: " + x.map(_.toString).mkString("\n"))
+      val xxx = r ++ x
+      val all = xxx.toSet[File]
+      all
+    }
 
-		val extraClasses =
-			{
-			try
-			{
-			{
-			if (!classpathFiles.isEmpty)
-				{
-				val finder = ClassFinder(classpathFiles)
-				finder.getClasses
-				}
-			else List[ClassInfo]()
-			}
-			}
-			catch
-			{
-			case e: NoSuchElementException => List[ClassInfo]()
-			}
-			}
+    val extraClasses = {
+      try { {
+        if (!classpathFiles.isEmpty) {
+          val finder = ClassFinder(classpathFiles)
+          finder.getClasses
+        }
+        else List[ClassInfo]()
+      }
+      }
+      catch {
+        case e: NoSuchElementException => List[ClassInfo]()
+      }
+    }
 
-		val classes = ClassFinder(classpath.toSeq).getClasses() ++ extraClasses
-		val allClassMap = ClassFinder.classInfoMap(classes)
-		allClassMap
-		}
+    val classes = ClassFinder(classpath.toSeq).getClasses() ++ extraClasses
+    val allClassMap = ClassFinder.classInfoMap(classes)
+    allClassMap
+  }
 
-	private lazy val filteredClasses =
-		{
-		//logger.warn("Finding " + pluginBaseName + " in classpath: ")
-		val x = ClassFinder.concreteSubclasses(pluginBaseName, allClasses) ++ allClasses.get(pluginBaseName)
+  private lazy val filteredClasses = {
+    //logger.warn("Finding " + pluginBaseName + " in classpath: ")
+    val x = ClassFinder.concreteSubclasses(pluginBaseName, allClasses) ++ allClasses.get(pluginBaseName)
 
 
-		//logger.warn(x.map(_.toString).mkString("\n"))
-		val result = x.map((ci) =>
-			                   {
-			                   val n: String = ci.name
-			                   (n -> ci)
-			                   }).toMap
+    //logger.warn(x.map(_.toString).mkString("\n"))
+    val result = x.map((ci) => {
+      val n: String = ci.name
+      (n -> ci)
+    }).toMap
 
 
-		//logger.warn(result.map(_.toString()).mkString("\n"))
-		result
-		}
+    //logger.warn(result.map(_.toString()).mkString("\n"))
+    result
+  }
 
-	def findPlugins[T](implicit man: Manifest[T]): Map[String, T] = new SingleTypePluginManager[T].findPlugins(filteredClasses)
+  def findPlugins[T](implicit man: Manifest[T]): Map[String, T] = new SingleTypePluginManager[T].findPlugins(filteredClasses)
 
-	//def findPlugins[T](): Map[String, T] = Map()
-	private class SingleTypePluginManager[T](implicit man: Manifest[T])
-		{
-		val baseTypeName = man.erasure.getName
-		/**
-		 * Returns a map from plugin names to plugins.  If the plugin has a "name" member, it is used; otherwise the class name is used.
-		 * @param classes
-		 * @return
-		 */
-		def findPlugins(classes: Map[String, ClassInfo]): Map[String, T] =
-			{
+  //def findPlugins[T](): Map[String, T] = Map()
+  private class SingleTypePluginManager[T](implicit man: Manifest[T]) {
+    val baseTypeName = man.erasure.getName
 
-			//logger.warn("Finding " + baseTypeName + " in classpath: ")
-			val x = ClassFinder.concreteSubclasses(baseTypeName, classes ++ allClasses.get(baseTypeName).map(baseTypeName -> _))
+    /**
+     * Returns a map from plugin names to plugins.  If the plugin has a "name" member, it is used; otherwise the class name is used.
+     * @param classes
+     * @return
+     */
+    def findPlugins(classes: Map[String, ClassInfo]): Map[String, T] = {
 
-			x.map((ci) =>
-				      {
-				      val className: String = ci.name
+      //logger.warn("Finding " + baseTypeName + " in classpath: ")
+      val x = ClassFinder.concreteSubclasses(baseTypeName, classes ++ allClasses.get(baseTypeName).map(baseTypeName -> _))
 
-				      val comp: T = companion(className)
-				      //logger.warn("Found: " + className + " -> " + comp.toString)
-				      val pluginName = if (comp.isInstanceOf[PluginManager.HasName]) comp.asInstanceOf[PluginManager.HasName].name else className;
-				      (pluginName -> comp)
-				      }).toMap
-			}
+      x.map((ci) => {
+        val className: String = ci.name
 
-		class Bogus
-			{}
+        val comp: T = companion(className)
+        //logger.warn("Found: " + className + " -> " + comp.toString)
+        val pluginName = if (comp.isInstanceOf[PluginManager.HasName]) comp.asInstanceOf[PluginManager.HasName].name else className
+        (pluginName -> comp)
+      }).toMap
+    }
 
-		val classloader = new URLClassLoader(classpathFiles.map(_.toURL), classOf[Bogus].getClassLoader)
-		//logger.warn("Built classloader: " + classloader.getURLs.mkString("\n"))
+    class Bogus {}
 
-		private def companion(name: String): T =
-			{
-			val classname: String = if (name.endsWith("$")) name else (name + "$")
-			//logger.warn("Loading class " + classname)
+    val classloader = new URLClassLoader(classpathFiles.map(_.toURI.toURL), classOf[Bogus].getClassLoader)
+    //logger.warn("Built classloader: " + classloader.getURLs.mkString("\n"))
 
-			classloader.loadClass(classname).getField("MODULE$").get(man.erasure).asInstanceOf[T]
-			}
-		}
+    private def companion(name: String): T = {
+      val classname: String = if (name.endsWith("$")) name else (name + "$")
+      //logger.warn("Loading class " + classname)
 
-	}
+      classloader.loadClass(classname).getField("MODULE$").get(man.erasure).asInstanceOf[T]
+    }
+  }
 
-object PluginManager
-	{
-	type HasName =
-	{def name: String}
-	}
+}
+
+object PluginManager {
+  type HasName = {def name: String}
+}
