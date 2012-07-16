@@ -1,12 +1,12 @@
 import sbt._
-import edu.umass.cs.iesl.sbtbase.{CleanLogging, Dependencies, IeslProject}
+import edu.umass.cs.iesl.sbtbase.{Dependencies, IeslProject}
 import edu.umass.cs.iesl.sbtbase.IeslProject._
 
 object ScalaCommonsBuild extends Build {
 
   val vers = "0.1-SNAPSHOT"
 
-  implicit val allDeps : Dependencies = new Dependencies(); //(CleanLogging.excludeLoggers)  // doesn't work?
+  implicit val allDeps: Dependencies = new Dependencies(); //(CleanLogging.excludeLoggers)  // doesn't work?
 
   import allDeps._
 
