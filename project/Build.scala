@@ -6,14 +6,11 @@ object ScalaCommonsBuild extends Build {
 
   val vers = "0.1-SNAPSHOT"
 
-  val allDeps = new Dependencies(CleanLogging.excludeLoggers)
+  implicit val allDeps : Dependencies = new Dependencies(); //(CleanLogging.excludeLoggers)  // doesn't work?
 
   import allDeps._
 
   val deps = Seq(
-    logbackClassic(),
-    logbackCore(),
-    slf4s(),
     dsutils(),
     commonsIo(),
     dispatchCore(),
@@ -27,9 +24,9 @@ object ScalaCommonsBuild extends Build {
     scalaIoFile(),
     jdom("1.1.3"),
     mavenCobertura(),
-    mavenFindbugs()) ++ standardLogging
+    mavenFindbugs())
 
 
-  lazy val scalacommons = IeslProject("scalacommons", vers, deps, Public)
+  lazy val scalacommons = IeslProject("scalacommons", vers, deps, Public).cleanLogging.standardLogging
 
 }
