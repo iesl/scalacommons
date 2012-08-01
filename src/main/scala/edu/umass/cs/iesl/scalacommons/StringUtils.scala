@@ -1,47 +1,62 @@
 package edu.umass.cs.iesl.scalacommons
 
-object StringUtils
-	{
-	implicit def emptyStringToNone(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))
+import java.util.regex.Pattern
 
-	implicit def stringToOptionInt(s: String): Option[Int] = if (s.trim.isEmpty) None else Some(s.toInt)
+object StringUtils {
+  implicit def emptyStringToNone(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))
 
-	implicit def enrichString(s: String) : RichString = new RichString(s)
+  implicit def stringToOptionInt(s: String): Option[Int] = if (s.trim.isEmpty) None else Some(s.toInt)
 
-	implicit def unwrapNonemptyString(n: NonemptyString) : String = n.s
+  implicit def enrichString(s: String): RichString = new RichString(s)
 
-	implicit def unwrapNonemptyString(n: Option[NonemptyString]): String = n.map(unwrapNonemptyString).getOrElse("")
+  implicit def unwrapNonemptyString(n: NonemptyString): String = n.s
 
-	//implicit def wrapNonemptyString(s: String) = NonemptyString(s)
-	}
+  implicit def unwrapNonemptyString(n: Option[NonemptyString]): String = n.map(unwrapNonemptyString).getOrElse("")
 
-class RichString(val s: String)
-	{
-	def removeNewlines: String = s.replaceAll("[\\n\\r]+", " ")
+  //implicit def wrapNonemptyString(s: String) = NonemptyString(s)
+}
 
-	def removeNewlinesAndTabs: String = s.replaceAll("[\\n\\r\\t]+", " ")
+object RichString {
 
-	def removePunctuation: String = s.replaceAll("\\p{Punct}+", " ")
+  final private val deAccentPattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
+}
 
-	def removeAllButWord: String = s.replaceAll("[^\\w\\s]+", " ")
+class RichString(val s: String) {
 
-	def collapseWhitespace: String = s.replaceAll("\\s+", " ")
-	}
+  import java.text.Normalizer
+  import RichString._
 
-case class NonemptyString(s: String)
-	{
-	require(s.nonEmpty)
+  def removeNewlines: String = s.replaceAll("[\\n\\r]+", " ")
 
-	override def toString = s
+  def removeNewlinesAndTabs: String = s.replaceAll("[\\n\\r\\t]+", " ")
 
-	override def equals(other: Any): Boolean = other match
-	{
-		case that: NonemptyString => this.s == that.s
-		case _ => false
-	}
+  def removeWhitespace: String = s.replaceAll("\\s", "")
 
-	override def hashCode: Int = s.hashCode
+  def removePunctuation: String = s.replaceAll("\\p{Punct}+", " ")
+
+  def removeAllButWord: String = s.replaceAll("[^\\w\\s]+", " ")
+
+  def collapseWhitespace: String = s.replaceAll("\\s+", " ")
+
+  //http://stackoverflow.com/questions/1008802/converting-symbols-accent-letters-to-english-alphabet
+  def deAccent(str: String): String = {
+    val nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD)
+    return deAccentPattern.matcher(nfdNormalizedString).replaceAll("")
+  }
+}
+
+case class NonemptyString(s: String) {
+  require(s.nonEmpty)
+
+  override def toString = s
+
+  override def equals(other: Any): Boolean = other match {
+    case that: NonemptyString => this.s == that.s
+    case _ => false
+  }
+
+  override def hashCode: Int = s.hashCode
 
 
-	//def +(that:NonemptyString) = new NonemptyString(s + that.s)
-	}
+  //def +(that:NonemptyString) = new NonemptyString(s + that.s)
+}
