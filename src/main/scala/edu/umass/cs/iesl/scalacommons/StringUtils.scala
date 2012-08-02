@@ -41,8 +41,8 @@ class RichString(val s: String) {
   def collapseWhitespace: String = s.replaceAll("\\s+", " ")
 
   //http://stackoverflow.com/questions/1008802/converting-symbols-accent-letters-to-english-alphabet
-  def deAccent(str: String): String = {
-    val nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD)
+  def deAccent: String = {
+    val nfdNormalizedString = Normalizer.normalize(s, Normalizer.Form.NFD)
     return deAccentPattern.matcher(nfdNormalizedString).replaceAll("")
   }
 }
