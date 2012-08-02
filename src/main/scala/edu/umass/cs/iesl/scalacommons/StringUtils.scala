@@ -36,6 +36,8 @@ class RichString(val s: String) {
 
   def removeAllButWord: String = s.replaceAll("[^\\w\\s]+", " ")
 
+  def removeVowels: String = s.replaceAll("[AEIOUaeiou]", "")
+
   def collapseWhitespace: String = s.replaceAll("\\s+", " ")
 
   //http://stackoverflow.com/questions/1008802/converting-symbols-accent-letters-to-english-alphabet
