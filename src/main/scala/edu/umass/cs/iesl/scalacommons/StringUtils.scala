@@ -9,6 +9,7 @@ object StringUtils {
 
   implicit def enrichString(s: String): RichString = new RichString(s)
 
+  //** just use NonemptyString.unapply
   implicit def unwrapNonemptyString(n: NonemptyString): String = n.s
 
   implicit def unwrapNonemptyString(n: Option[NonemptyString]): String = n.map(unwrapNonemptyString).getOrElse("")
@@ -43,7 +44,13 @@ class RichString(val s: String) {
   //http://stackoverflow.com/questions/1008802/converting-symbols-accent-letters-to-english-alphabet
   def deAccent: String = {
     val nfdNormalizedString = Normalizer.normalize(s, Normalizer.Form.NFD)
-    return deAccentPattern.matcher(nfdNormalizedString).replaceAll("")
+    deAccentPattern.matcher(nfdNormalizedString).replaceAll("")
+  }
+
+  def isAllCaps: Boolean = {
+    val lc = """[a-z]""".r
+    val r = lc.findFirstIn(s)
+    r.isEmpty
   }
 }
 
