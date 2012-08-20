@@ -47,8 +47,14 @@ class RichString(val s: String) {
     deAccentPattern.matcher(nfdNormalizedString).replaceAll("")
   }
 
-  def isAllCaps: Boolean = {
+  def isAllUpperCase: Boolean = {
     val lc = """[a-z]""".r
+    val r = lc.findFirstIn(s)
+    r.isEmpty
+  }
+
+  def isAllLowerCase: Boolean = {
+    val lc = """[A-Z]""".r
     val r = lc.findFirstIn(s)
     r.isEmpty
   }
