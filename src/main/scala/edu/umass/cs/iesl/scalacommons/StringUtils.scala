@@ -3,9 +3,9 @@ package edu.umass.cs.iesl.scalacommons
 import java.util.regex.Pattern
 
 object StringUtils {
-  implicit def emptyStringToNone(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))
+  implicit def toOptionNonempty(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))
 
-  implicit def emptyStringToNone(ss: Traversable[String]): Traversable[NonemptyString] = ss.flatMap(emptyStringToNone)
+  implicit def toSetNonempty(ss: Traversable[String]): Traversable[NonemptyString] = ss.flatMap(toOptionNonempty)
 
   implicit def stringToOptionInt(s: String): Option[Int] = if (s.trim.isEmpty) None else Some(s.toInt)
 
@@ -43,7 +43,7 @@ class RichString(val s: String) {
 
   def collapseWhitespace: String = s.replaceAll("\\s+", " ")
 
-  def opt: Option[NonemptyString] = StringUtils.emptyStringToNone(s)
+  def opt: Option[NonemptyString] = StringUtils.toOptionNonempty(s)
 
   def n: NonemptyString = new NonemptyString(s.trim)
 
