@@ -5,9 +5,12 @@ import java.util.regex.Pattern
 object StringUtils {
   implicit def toOptionNonempty(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))
 
+  implicit def toSingletonSetNonempty(s: String): Set[NonemptyString] = toOptionNonempty(s).toSet
+
   implicit def toSetNonempty[T <: Set[String]](ss: T): Set[NonemptyString] = ss.flatMap(toOptionNonempty)
 
   implicit def toSeqNonempty[T <: Seq[String]](ss: T): Seq[NonemptyString] = ss.flatMap(toOptionNonempty)
+
 
   //** need to understand CanBuildFrom etc. to make this work right
   //implicit def toTraversableNonempty[T <: Traversable[String]](ss: T): T[NonemptyString] = ss.flatMap(toOptionNonempty)
