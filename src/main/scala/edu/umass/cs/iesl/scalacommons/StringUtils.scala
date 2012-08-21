@@ -5,7 +5,8 @@ import java.util.regex.Pattern
 object StringUtils {
   implicit def toOptionNonempty(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))
 
-  implicit def toSingletonSetNonempty(s: String): Set[NonemptyString] = toOptionNonempty(s).toSet
+  // don't make this implicit; that would mask implicit conversions in Predef, providing String.size, String.nonEmpty, etc.
+  //def toSingletonSetNonempty(s: String): Set[NonemptyString] = toOptionNonempty(s).toSet
 
   implicit def toSetNonempty[T <: Set[String]](ss: T): Set[NonemptyString] = ss.flatMap(toOptionNonempty)
 
@@ -57,6 +58,8 @@ class RichString(val s: String) {
   def opt: Option[NonemptyString] = StringUtils.toOptionNonempty(s)
 
   def n: NonemptyString = new NonemptyString(s.trim)
+
+  def just: Set[NonemptyString] = opt.toSet
 
   //http://stackoverflow.com/questions/1008802/converting-symbols-accent-letters-to-english-alphabet
   // see also icu4j Transliterator-- better, but a 7 MB jar, yikes.
