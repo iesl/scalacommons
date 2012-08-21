@@ -5,7 +5,13 @@ import java.util.regex.Pattern
 object StringUtils {
   implicit def toOptionNonempty(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))
 
-  implicit def toTraversableNonempty[T <: Traversable[String]](ss: T): Traversable[NonemptyString] = ss.flatMap(toOptionNonempty)
+  implicit def toSetNonempty[T <: Set[String]](ss: T): Set[NonemptyString] = ss.flatMap(toOptionNonempty)
+
+  //** need to understand CanBuildFrom etc. to make this work right
+  //implicit def toTraversableNonempty[T <: Traversable[String]](ss: T): T[NonemptyString] = ss.flatMap(toOptionNonempty)
+
+  //def toTraversableNonempty2[B, That, Repr](ss: B)(implicit bf: CanBuildFrom[Repr, B, That]): That = {}
+  // def flatMap[B, That](f: A => GenTraversableOnce[B])(implicit bf: CanBuildFrom[Repr, B, That]): That = {}
 
   implicit def stringToOptionInt(s: String): Option[Int] = if (s.trim.isEmpty) None else Some(s.toInt)
 
