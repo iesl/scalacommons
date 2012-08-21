@@ -7,6 +7,8 @@ object StringUtils {
 
   implicit def toSetNonempty[T <: Set[String]](ss: T): Set[NonemptyString] = ss.flatMap(toOptionNonempty)
 
+  implicit def toSeqNonempty[T <: Seq[String]](ss: T): Seq[NonemptyString] = ss.flatMap(toOptionNonempty)
+
   //** need to understand CanBuildFrom etc. to make this work right
   //implicit def toTraversableNonempty[T <: Traversable[String]](ss: T): T[NonemptyString] = ss.flatMap(toOptionNonempty)
 
