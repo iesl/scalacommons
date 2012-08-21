@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 object StringUtils {
   implicit def toOptionNonempty(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))
 
-  implicit def toSetNonempty(ss: Traversable[String]): Traversable[NonemptyString] = ss.flatMap(toOptionNonempty)
+  implicit def toTraversableNonempty[T <: Traversable[String]](ss: T[String]): Traversable[NonemptyString] = ss.flatMap(toOptionNonempty)
 
   implicit def stringToOptionInt(s: String): Option[Int] = if (s.trim.isEmpty) None else Some(s.toInt)
 
