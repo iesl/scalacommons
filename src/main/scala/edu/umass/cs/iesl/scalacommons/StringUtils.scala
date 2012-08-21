@@ -41,17 +41,19 @@ class RichString(val s: String) {
   import java.text.Normalizer
   import RichString._
 
-  def removeNewlines: String = s.replaceAll("[\\n\\r]+", " ")
+  def maskNewlines: String = s.replaceAll("[\\n\\r]+", " ")
 
-  def removeNewlinesAndTabs: String = s.replaceAll("[\\n\\r\\t]+", " ")
+  def maskNewlinesAndTabs: String = s.replaceAll("[\\n\\r\\t]+", " ")
 
-  def removeWhitespace: String = s.replaceAll("\\s", "")
+  def stripWhitespace: String = s.replaceAll("\\s", "")
 
-  def removePunctuation: String = s.replaceAll("\\p{Punct}+", " ")
+  def maskPunctuation: String = s.replaceAll("\\p{Punct}+", " ")
 
-  def removeAllButWord: String = s.replaceAll("[^\\w\\s]+", " ")
+  def stripPunctuation: String = s.replaceAll("\\p{Punct}+", "")
 
-  def removeVowels: String = s.replaceAll("[AEIOUaeiou]", "")
+  def maskAllButWord: String = s.replaceAll("[^\\w\\s]+", " ")
+
+  def stripVowels: String = s.replaceAll("[AEIOUaeiou]", "")
 
   def collapseWhitespace: String = s.replaceAll("\\s+", " ")
 
