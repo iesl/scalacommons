@@ -5,6 +5,8 @@ import java.util.regex.Pattern
 object StringUtils {
   implicit def emptyStringToNone(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))
 
+  implicit def emptyStringToNone(ss: Traversable[String]): Traversable[NonemptyString] = ss.flatMap(emptyStringToNone)
+
   implicit def stringToOptionInt(s: String): Option[Int] = if (s.trim.isEmpty) None else Some(s.toInt)
 
   implicit def enrichString(s: String): RichString = new RichString(s)
@@ -41,7 +43,12 @@ class RichString(val s: String) {
 
   def collapseWhitespace: String = s.replaceAll("\\s+", " ")
 
+  def opt: Option[NonemptyString] = StringUtils.emptyStringToNone(s)
+
+  def n: NonemptyString = new NonemptyString(s.trim)
+
   //http://stackoverflow.com/questions/1008802/converting-symbols-accent-letters-to-english-alphabet
+  // see also icu4j Transliterator-- better, but a 7 MB jar, yikes.
   def deAccent: String = {
     val nfdNormalizedString = Normalizer.normalize(s, Normalizer.Form.NFD)
     deAccentPattern.matcher(nfdNormalizedString).replaceAll("")
