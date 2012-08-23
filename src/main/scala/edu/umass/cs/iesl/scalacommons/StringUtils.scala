@@ -29,7 +29,14 @@ object StringUtils {
   // this is bad because they confound map, size, etc. operations from String and Option
   //implicit def unwrapNonemptyString(n: Option[NonemptyString]): String = n.map(unwrapNonemptyString).getOrElse("")
 
+  // but this should be OK, because it requires an explicit "unwrap" or whatever
+  implicit def enrichNonemptyString(n: Option[NonemptyString]): OptionNonemptyString = new OptionNonemptyString(n)
+
   //implicit def wrapNonemptyString(s: String) = NonemptyString(s)
+}
+
+class OptionNonemptyString(val o: Option[NonemptyString]) {
+  def unwrap: String = o.map(_.s).getOrElse("")
 }
 
 object RichString {
