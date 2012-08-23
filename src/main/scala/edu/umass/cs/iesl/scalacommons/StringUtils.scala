@@ -26,7 +26,8 @@ object StringUtils {
   //** just use NonemptyString.unapply
   implicit def unwrapNonemptyString(n: NonemptyString): String = n.s
 
-  implicit def unwrapNonemptyString(n: Option[NonemptyString]): String = n.map(unwrapNonemptyString).getOrElse("")
+  // this is bad because they confound map, size, etc. operations from String and Option
+  //implicit def unwrapNonemptyString(n: Option[NonemptyString]): String = n.map(unwrapNonemptyString).getOrElse("")
 
   //implicit def wrapNonemptyString(s: String) = NonemptyString(s)
 }
