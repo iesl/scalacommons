@@ -42,6 +42,7 @@ class OptionNonemptyString(val o: Option[NonemptyString]) {
 object RichString {
 
   final private val deAccentPattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
+  final private val trimPunctuationRE = "^\\p{Punct}*(.*?)\\p{Punct}*$"
 }
 
 class RichString(val s: String) {
@@ -58,6 +59,11 @@ class RichString(val s: String) {
   def maskPunctuation: String = s.replaceAll("\\p{Punct}+", " ")
 
   def stripPunctuation: String = s.replaceAll("\\p{Punct}+", "")
+
+  def trimPunctuation: String = {
+    val trimPunctuationRE(result) = s
+    result
+  }
 
   def maskAllButWord: String = s.replaceAll("[^\\w\\s]+", " ")
 
