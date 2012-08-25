@@ -42,7 +42,7 @@ class OptionNonemptyString(val o: Option[NonemptyString]) {
 object RichString {
 
   final private val deAccentPattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
-  final private val trimPunctuationRE = "^\\p{Punct}*(.*?)\\p{Punct}*$"
+  final private val trimPunctuationRE = "^\\p{Punct}*(.*?)\\p{Punct}*$".r
 }
 
 class RichString(val s: String) {
