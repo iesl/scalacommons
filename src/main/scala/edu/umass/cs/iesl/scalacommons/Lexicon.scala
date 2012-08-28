@@ -8,9 +8,14 @@ import java.io.InputStream
  */
 
 // usage:
+// val stopwords = new Lexicon("stopwords")
+// or
 // val stopwords = new Lexicon(getClass.getResourceAsStream("/lexicons/stopwords"))
 
 class Lexicon(s: InputStream) {
+
+  def this(name: String) = this(getClass.getResourceAsStream("/lexicons/" + name))
+
   val (lexTokens, lexTokensLC) = {
     val text: String = IOUtils.loadText(s)
     val lexTokensLC: Map[String, Boolean] = text.toLowerCase.split("\n").map(x => (x -> true)).toMap
