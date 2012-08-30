@@ -17,7 +17,11 @@ import scala.util.matching.Regex
 
 class Lexicon(s: InputStream) extends Logging {
 
-  def this(name: String) = this(getClass.getResourceAsStream("/lexicons/" + name))
+  def this(name: String) =
+    this({
+      val is = getClass.getResourceAsStream("/lexicons/" + name); if (is != null) is else getClass.getResourceAsStream("/lexicons/" + name + ".txt")
+    })
+
 
   private val (lexTokens, lexTokensLC, lexTokensStrippedLCREs) = {
     val text: String = IOUtils.loadText(s)
