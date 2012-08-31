@@ -11,9 +11,9 @@ object SeqUtils extends Logging {
 
   implicit def emptyCollectionToNone[T <: GenTraversable[Any]](s: T): Option[T] = if (s.isEmpty) None else Some(s)
 
-  def mergeWarn[T](a: GenTraversable[T], b: GenTraversable[T]): GenTraversable[T] = {
+  def mergeWarn[T, This <: GenTraversable[T]](a: This, b: This): This = {
     (a, b) match {
-      case (Nil, Nil) => Nil
+      case (Nil, Nil) => a
       case (p, Nil) => a
       case (Nil, q) => b
       case (p, q) => {
@@ -25,9 +25,9 @@ object SeqUtils extends Logging {
     }
   }
 
-  def mergeOrFail[T](a: GenTraversable[T], b: GenTraversable[T]): GenTraversable[T] = {
+  def mergeOrFail[T, This <: GenTraversable[T]](a: This, b: This): This = {
     (a, b) match {
-      case (Nil, Nil) => Nil
+      case (Nil, Nil) => a
       case (p, Nil) => a
       case (Nil, q) => b
       case (p, q) => {
