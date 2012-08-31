@@ -44,12 +44,15 @@ class Lexicon(s: InputStream) extends Logging {
   }
 
   // Maybe: consider newlines in the input to be a hard constraint, but strip the spaces within each line
+  // careful, the matches might overlap and double-count tokens etc.
   def countSubstringMatchesLC(s: String): Int = substringMatchesLC(s).values.sum
 
   /* {
     val target = s.toLowerCase
     (for (r <- lexTokensStrippedLCREs) yield r.findAllIn(target).size).sum
   }*/
+
+  def countTokenMatchesLC(s: String): Int = countMatchesLC(s.split("\\W+"))
 
   def substringMatchesLC(s: String): Map[String, Int] = {
     val target = s.toLowerCase
