@@ -36,11 +36,11 @@ class Lexicon(s: InputStream) extends Logging {
   }
 
   def countMatches(tokens: Seq[String]): Int = {
-    tokens.filter(lexTokens.contains(_)).flatten.length
+    tokens.filter(lexTokens.contains(_)).length
   }
 
   def countMatchesLC(tokens: Seq[String]): Int = {
-    tokens.filter(s => lexTokensLC.contains(s.toLowerCase)).flatten.length
+    tokens.filter(s => lexTokensLC.contains(s.toLowerCase)).length
   }
 
   // Maybe: consider newlines in the input to be a hard constraint, but strip the spaces within each line
