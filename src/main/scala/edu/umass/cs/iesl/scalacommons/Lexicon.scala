@@ -26,7 +26,7 @@ class Lexicon(s: InputStream) extends Logging {
 
   private val (lexTokens, lexTokensLC, lexTokensStrippedLCREs) = {
     val text: String = IOUtils.loadText(s)
-    val lexTokens: Set[String] = text.split("\n").toSet.map(_.trim).filter(_.nonEmpty)
+    val lexTokens: Set[String] = text.split("\n").toSet.map((s: String) => s.trim).filter(_.nonEmpty)
     for (t <- lexTokens if t.contains(" ")) {
       logger.warn("Token contains a space: " + t + ", use countSubstringMatchesLC")
     }
