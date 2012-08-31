@@ -19,13 +19,14 @@ class Lexicon(s: InputStream) extends Logging {
 
   def this(name: String) =
     this({
-      val is = getClass.getResourceAsStream("/lexicons/" + name); if (is != null) is else getClass.getResourceAsStream("/lexicons/" + name + ".txt")
+      val is = getClass.getResourceAsStream("/lexicons/" + name);
+      if (is != null) is else getClass.getResourceAsStream("/lexicons/" + name + ".txt")
     })
 
 
   private val (lexTokens, lexTokensLC, lexTokensStrippedLCREs) = {
     val text: String = IOUtils.loadText(s)
-    val lexTokens: Set[String] = text.split("\n").toSet
+    val lexTokens: Set[String] = text.split("\n").toSet.map(_.trim).filter(_.nonEmpty)
     for (t <- lexTokens if t.contains(" ")) {
       logger.warn("Token contains a space: " + t + ", use countSubstringMatchesLC")
     }
