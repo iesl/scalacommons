@@ -1,7 +1,7 @@
 package edu.umass.cs.iesl.scalacommons
 
 import com.weiglewilczek.slf4s.Logging
-import collection.GenTraversable
+import collection.{GenIterable, GenTraversable}
 
 /**
  * @author <a href="mailto:dev@davidsoergel.com">David Soergel</a>
@@ -39,20 +39,36 @@ object SeqUtils extends Logging {
     }
   }
 
-
   // based on Daniel Sobral.  http://stackoverflow.com/questions/3050557/how-can-i-extend-scala-collections-with-an-argmax-method
-  def argMax[A, B: Ordering](input: Iterable[A], f: A => B) = argMaxZip(input, f) map (_._1) toSet
+  // but that had serious issues!  Rewritten...
 
-  // compact version
+  def argMax[A, B: Ordering](input: GenIterable[A], f: A => B) = argMaxZip(input, f) map (_._1) toSet
 
-  def argMaxZip[A, B: Ordering](input: Iterable[A], f: A => B): Iterable[(A, B)] = {
-    val fList = input map f
-    val maxFList = fList.max
-    input.view zip fList filter (_._2 == maxFList)
+  def argMaxZip[A, B: Ordering](input: GenIterable[A], f: A => B): GenIterable[(A, B)] = {
+    if (input.isEmpty) Nil
+    else {
+      val fPairs = input map (x => (x, f(x)))
+      val maxF = fPairs.map(_._2).max
+      fPairs filter (_._2 == maxF)
+    }
   }
 
-  // could do a version that produces (B, Iterable[A]]
+  // trouble using Ordering.reverse, so just cut and paste for now
 
+  def argMin[A, B: Ordering](input: GenIterable[A], f: A => B) = argMinZip(input, f) map (_._1) toSet
+
+
+  def argMinZip[A, B: Ordering](input: GenIterable[A], f: A => B): GenIterable[(A, B)] = {
+    if (input.isEmpty) Nil
+    else {
+      val fPairs = input map (x => (x, f(x)))
+      val minF = fPairs.map(_._2).min
+      fPairs filter (_._2 == minF)
+    }
+  }
+
+
+  // could do a version that produces (B, Iterable[A]]
 }
 
 class SeqMergeException[T](x: T, y: T) extends Exception("unequal sequences: " + x + "  ,  " + y)
