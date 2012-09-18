@@ -1,7 +1,7 @@
 package edu.umass.cs.iesl.scalacommons
 
 import com.weiglewilczek.slf4s.Logging
-import collection.{GenIterable, GenTraversable}
+import collection.{GenSet, GenIterable, GenTraversable}
 
 /**
  * @author <a href="mailto:dev@davidsoergel.com">David Soergel</a>
@@ -42,7 +42,7 @@ object SeqUtils extends Logging {
   // based on Daniel Sobral.  http://stackoverflow.com/questions/3050557/how-can-i-extend-scala-collections-with-an-argmax-method
   // but that had serious issues!  Rewritten...
 
-  def argMax[A, B: Ordering](input: GenIterable[A], f: A => B) = argMaxZip(input, f) map (_._1) toSet
+  def argMax[A, B: Ordering](input: GenIterable[A], f: A => B): GenSet[A] = argMaxZip(input, f) map (_._1) toSet
 
   def argMaxZip[A, B: Ordering](input: GenIterable[A], f: A => B): GenIterable[(A, B)] = {
     if (input.isEmpty) Nil
@@ -55,7 +55,7 @@ object SeqUtils extends Logging {
 
   // trouble using Ordering.reverse, so just cut and paste for now
 
-  def argMin[A, B: Ordering](input: GenIterable[A], f: A => B) = argMinZip(input, f) map (_._1) toSet
+  def argMin[A, B: Ordering](input: GenIterable[A], f: A => B): GenSet[A] = argMinZip(input, f) map (_._1) toSet
 
 
   def argMinZip[A, B: Ordering](input: GenIterable[A], f: A => B): GenIterable[(A, B)] = {
