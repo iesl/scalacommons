@@ -79,7 +79,7 @@ class RichString(val s: String) {
 
   //http://stackoverflow.com/questions/1008802/converting-symbols-accent-letters-to-english-alphabet
   // see also icu4j Transliterator-- better, but a 7 MB jar, yikes.
-  def deAccent: String = {
+  lazy val deAccent: String = {
     val nfdNormalizedString = Normalizer.normalize(s, Normalizer.Form.NFD)
     deAccentPattern.matcher(nfdNormalizedString).replaceAll("")
   }
@@ -87,13 +87,13 @@ class RichString(val s: String) {
 
   def containsLowerCase: Boolean = {
     val lc = """[a-z]""".r
-    val r = lc.findFirstIn(s)
+    val r = lc.findFirstIn(deAccent)
     r.nonEmpty
   }
 
   def containsUpperCase: Boolean = {
     val lc = """[A-Z]""".r
-    val r = lc.findFirstIn(s)
+    val r = lc.findFirstIn(deAccent)
     r.nonEmpty
   }
 
