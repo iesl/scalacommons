@@ -82,7 +82,7 @@ class RichString(val s: String) extends Logging {
   // see also icu4j Transliterator-- better, but a 7 MB jar, yikes.
   // Note this does not catch all interesting Unicode characters, e.g. Norwegian O-slash.  http://stackoverflow.com/questions/8043935/normalizing-unaccenting-text-in-java
   lazy val deAccent: String = {
-    val nfdNormalizedString = Normalizer.normalize(s, Normalizer.Form.NFKC)
+    val nfdNormalizedString = Normalizer.normalize(s, Normalizer.Form.NFD)
     val result = deAccentPattern.matcher(nfdNormalizedString).replaceAll("")
     logger.debug("Normalized: " + s + " -> " + nfdNormalizedString + " -> " + result)
     result
