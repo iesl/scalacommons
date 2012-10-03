@@ -15,4 +15,11 @@ class RichStringTest
   test("punctuation is trimmed") {
     assert(".Hello World,".trimPunctuation === "Hello World")
   }
+
+  test("Accented characters are detected as uppercase") {
+    assert(!"Æleen".isAllLowerCase)
+    assert(!"Øystein".isAllLowerCase)
+    assert("ÆLEEN".isAllUpperCase)
+    assert("ØYSTEIN".isAllUpperCase)
+  }
 }

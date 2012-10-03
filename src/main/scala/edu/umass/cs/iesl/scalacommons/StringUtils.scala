@@ -1,6 +1,7 @@
 package edu.umass.cs.iesl.scalacommons
 
 import java.util.regex.Pattern
+import com.weiglewilczek.slf4s.Logging
 
 object StringUtils {
   implicit def toOptionNonempty(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))
@@ -45,7 +46,7 @@ object RichString {
   final private val trimPunctuationRE = "^\\p{Punct}*(.*?)\\p{Punct}*$".r
 }
 
-class RichString(val s: String) {
+class RichString(val s: String) extends Logging {
 
   import java.text.Normalizer
   import RichString._
@@ -79,23 +80,30 @@ class RichString(val s: String) {
 
   //http://stackoverflow.com/questions/1008802/converting-symbols-accent-letters-to-english-alphabet
   // see also icu4j Transliterator-- better, but a 7 MB jar, yikes.
+  // Note this does not catch all interesting Unicode characters, e.g. Norwegian O-slash.  http://stackoverflow.com/questions/8043935/normalizing-unaccenting-text-in-java
   lazy val deAccent: String = {
-    val nfdNormalizedString = Normalizer.normalize(s, Normalizer.Form.NFD)
-    deAccentPattern.matcher(nfdNormalizedString).replaceAll("")
+    val nfdNormalizedString = Normalizer.normalize(s, Normalizer.Form.NFKC)
+    val result = deAccentPattern.matcher(nfdNormalizedString).replaceAll("")
+    logger.debug("Normalized: " + s + " -> " + nfdNormalizedString + " -> " + result)
+    result
   }
 
 
-  def containsLowerCase: Boolean = {
+  def containsLowerCase: Boolean = deAccent.find(_.isLower).isDefined
+
+  /*{
     val lc = """[a-z]""".r
     val r = lc.findFirstIn(deAccent)
     r.nonEmpty
-  }
+  }*/
 
-  def containsUpperCase: Boolean = {
+  def containsUpperCase: Boolean = deAccent.find(_.isUpper).isDefined
+
+  /*{
     val lc = """[A-Z]""".r
     val r = lc.findFirstIn(deAccent)
     r.nonEmpty
-  }
+  }*/
 
   def isAllUpperCase: Boolean = containsUpperCase && !containsLowerCase
 
