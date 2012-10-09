@@ -113,7 +113,7 @@ class RichString(val s: String) extends Logging {
 }
 
 case class NonemptyString(s: String) {
-  require(s.nonEmpty)
+  require(s.nonEmpty, "Expected non-empty String")
 
   override def toString = s
 

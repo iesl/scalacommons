@@ -15,13 +15,12 @@ object IeslPluginLoader extends Build {
 
 // as of sbt 0.12.0 we can rebuild the plugin on the fly from the hg repository,
 // avoiding the Nexus URL chicken-and-egg problem (or rather, pushing it back one level to the Bitbucket URL)
-
 /*
-import sbt._
-
 object IeslPluginLoader extends Build {
   override lazy val projects = Seq(root)
   lazy val root = Project("plugins", file(".")) dependsOn( ieslSbtBase )
-  lazy val ieslSbtBase = uri("hg:ssh://bitbucket.org/IESL/iesl-sbt-base")
+  lazy val ieslSbtBase = uri("hg:https://IESL@bitbucket.org/IESL/iesl-sbt-base")
+// uri("hg:ssh://bitbucket.org/IESL/iesl-sbt-base")
 }
- */
+
+*/

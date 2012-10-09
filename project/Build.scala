@@ -1,4 +1,5 @@
 import sbt._
+import sbt.Keys._
 import edu.umass.cs.iesl.sbtbase.{Dependencies, IeslProject}
 import edu.umass.cs.iesl.sbtbase.IeslProject._
 
