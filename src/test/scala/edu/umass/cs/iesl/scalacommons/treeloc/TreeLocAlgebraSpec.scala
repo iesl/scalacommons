@@ -34,12 +34,12 @@ object TreeLocAlgebraSpec extends mutable.Specification {
         val b2 = drawTreeLoc(l2) ∘ (text(_))
         val b12 = drawTreeLoc(l12) ∘ (text(_))
 
-        val tb1 = vcat(AlignFirst)(b1.toList)
-        val tb2 = vcat(AlignFirst)(b2.toList)
-        val tb12 = vcat(AlignFirst)(b12.toList)
+        // val tb1 = vcat(AlignFirst)(b1.toList)
+        // val tb2 = vcat(AlignFirst)(b2.toList)
+        // val tb12 = vcat(AlignFirst)(b12.toList)
 
-        val all = tb1 +| tb2 +| tb12
-        val result = (renderBox(all)).mkString("\n")
+        // val all = tb1 +| tb2 +| tb12
+        // val result = (renderBox(all)).mkString("\n")
         // println("result: \n" + result)
       }
 

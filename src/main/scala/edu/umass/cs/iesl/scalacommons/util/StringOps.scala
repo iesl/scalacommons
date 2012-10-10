@@ -61,7 +61,6 @@ object StringOps  {
     stripped.mkString("\n")
   }
 
-
 }
 
 class StringOps(s:String) {
