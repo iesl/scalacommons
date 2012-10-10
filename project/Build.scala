@@ -20,6 +20,7 @@ object ScalaCommonsBuild extends Build {
     specs2(),
     scalaIoCore(),
     scalaIoFile(),
+    "com.typesafe" % "config" % "latest.release", // TODO allDeps.typesafeConfig(),
     jdom("1.1.3"),
     mavenCobertura(),
     mavenFindbugs())
