@@ -14,12 +14,9 @@ object ScalaCommonsBuild extends Build {
   val deps = Seq(
     dsutils(),
     commonsIo(),
-    dispatchCore(),
-    dispatchHttp(),
     classutil(),
     scalaCompiler(),
     scalatest(),
-    scalazCore(),
     specs2(),
     scalaIoCore(),
     scalaIoFile(),
