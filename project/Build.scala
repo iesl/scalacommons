@@ -1,6 +1,5 @@
 import sbt._
-import sbt.Keys._
-import edu.umass.cs.iesl.sbtbase.{Dependencies, IeslProject}
+import edu.umass.cs.iesl.sbtbase.Dependencies
 import edu.umass.cs.iesl.sbtbase.IeslProject._
 
 object ScalaCommonsBuild extends Build {
@@ -25,6 +24,6 @@ object ScalaCommonsBuild extends Build {
     mavenFindbugs())
 
 
-  lazy val scalacommons = IeslProject("scalacommons", vers, deps, Public).cleanLogging.standardLogging
+  lazy val scalacommons = Project("scalacommons", file(".")).ieslSetup(vers, deps, Public).cleanLogging.standardLogging
 
 }
