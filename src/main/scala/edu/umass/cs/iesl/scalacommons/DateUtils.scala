@@ -25,8 +25,20 @@ object DateUtils {
       for (i <- 1 to 9) {
         result += ("0" + i.toString) -> (i - 1)
       }
+
+      // a reasonable approximation
+      result += "Winter" -> 0
+      result += "Spring" -> 3
+      result += "Summer" -> 6
+      result += "Fall" -> 9
+
     }
-    result.toMap
+    val r = result.toMap
+    r ++ r.map({
+      case (a, b) => (a.toLowerCase, b)
+    }) ++ r.map({
+      case (a, b) => (a.toUpperCase, b)
+    })
   }
 
   def parseMonthZeroBased(s: String) = zeroBasedMonthsByName(s.trim)
