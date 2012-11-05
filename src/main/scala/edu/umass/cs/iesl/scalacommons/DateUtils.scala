@@ -31,6 +31,7 @@ object DateUtils {
       result += "Spring" -> 3
       result += "Summer" -> 6
       result += "Fall" -> 9
+      result += "Christmas" -> 12
 
     }
     val r = result.toMap
@@ -41,8 +42,8 @@ object DateUtils {
     })
   }
 
-  def parseMonthZeroBased(s: String) = zeroBasedMonthsByName(s.trim)
+  def parseMonthZeroBased(s: String): Option[Int] = zeroBasedMonthsByName.get(s.trim)
 
-  def parseMonthOneBased(s: String) = zeroBasedMonthsByName(s.trim) + 1
+  def parseMonthOneBased(s: String): Option[Int] = zeroBasedMonthsByName.get(s.trim).map(_ + 1)
 }
 
