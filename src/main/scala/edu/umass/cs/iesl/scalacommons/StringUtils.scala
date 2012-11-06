@@ -80,6 +80,15 @@ class RichString(val s: String) extends Logging {
 
   def limit(len: Int): String = s.substring(0, math.max(s.length, len) - 1)
 
+  def limitAtWhitespace(len: Int, suffixIfLimited: String) = {
+    val l = limit(len + 1) // allow for a space after the last retained word
+    if (l.length < s.length) {
+      val r = l.substring(0, l.lastIndexOf(" "))
+      (r + suffixIfLimited)
+    } else s
+
+  }
+
   //http://stackoverflow.com/questions/1008802/converting-symbols-accent-letters-to-english-alphabet
   // see also icu4j Transliterator-- better, but a 7 MB jar, yikes.
   // Note this does not catch all interesting Unicode characters, e.g. Norwegian O-slash.  http://stackoverflow.com/questions/8043935/normalizing-unaccenting-text-in-java
