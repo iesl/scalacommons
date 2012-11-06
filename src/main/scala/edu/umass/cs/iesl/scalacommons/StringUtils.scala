@@ -78,6 +78,8 @@ class RichString(val s: String) extends Logging {
 
   def just: Set[NonemptyString] = opt.toSet
 
+  def limit(len: Int): String = s.substring(0, math.max(s.length, len) - 1)
+
   //http://stackoverflow.com/questions/1008802/converting-symbols-accent-letters-to-english-alphabet
   // see also icu4j Transliterator-- better, but a 7 MB jar, yikes.
   // Note this does not catch all interesting Unicode characters, e.g. Norwegian O-slash.  http://stackoverflow.com/questions/8043935/normalizing-unaccenting-text-in-java
