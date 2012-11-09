@@ -22,4 +22,11 @@ class RichStringTest
     assert("ÆLEEN".isAllUpperCase)
     assert("ØYSTEIN".isAllUpperCase)
   }
+
+  test("Limiting a string to a given length works") {
+    assert("abcd efg hi jkl".limit(10) == "abcd efg h")
+  }
+  test("Limiting a string to a given length, at whitespace, works") {
+    assert("abcd efg hi jkl".limitAtWhitespace(10, "...") == "abcd efg...")
+  }
 }

@@ -78,7 +78,7 @@ class RichString(val s: String) extends Logging {
 
   def just: Set[NonemptyString] = opt.toSet
 
-  def limit(len: Int): String = s.substring(0, math.min(s.length, len) - 1)
+  def limit(len: Int): String = s.substring(0, math.min(s.length, len))
 
   def limitAtWhitespace(len: Int, suffixIfLimited: String) = {
     val l = limit(len + 1) // allow for a space after the last retained word
