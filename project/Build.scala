@@ -25,6 +25,6 @@ object ScalaCommonsBuild extends Build {
     mavenFindbugs())
 
 
-  lazy val scalacommons = Project("scalacommons", file(".")).ieslSetup(vers, deps, Public).cleanLogging.standardLogging
+  lazy val scalacommons = Project("scalacommons", file(".")).ieslSetup(vers, deps, Public).cleanLogging.standardLogging()
 
 }
