@@ -23,7 +23,6 @@ class Lexicon(s: InputStream) extends Logging {
       if (is != null) is else getClass.getResourceAsStream("/lexicons/" + name + ".txt")
     })
 
-
   private val (lexTokens, lexTokensLC, lexTokensStrippedLCREs) = {
     val text: String = IOUtils.loadText(s)
     val lexTokens: Set[String] = text.split("\n").toSet.map((s: String) => s.trim).filter(_.nonEmpty).filter(!_.startsWith("#"))
@@ -52,6 +51,10 @@ class Lexicon(s: InputStream) extends Logging {
     (for (r <- lexTokensStrippedLCREs) yield r.findAllIn(target).size).sum
   }*/
 
+  def matches(tokens: Seq[String]): Seq[String] = tokens.filter(t => lexTokens.contains(t))
+
+  def matchesLC(tokens: Seq[String]): Seq[String] = tokens.filter(t => lexTokensLC.contains(t.toLowerCase))
+
   def countTokenMatchesLC(s: String): Int = countMatchesLC(s.split("\\W+"))
 
   def substringMatchesLC(s: String): Map[String, Int] = {
@@ -60,23 +63,11 @@ class Lexicon(s: InputStream) extends Logging {
     matchesPerToken
   }
 
-
   // use these as filters, e.g. mySeq.filter(someLexicon.exact)
 
   def exact(s: String): Boolean = lexTokens.contains(s)
 
   def lc(s: String): Boolean = lexTokensLC.contains(s)
 
-  /*
-  def matches(tokens: Seq[String]): Seq[String] = {
-    tokens.filter(t => lexTokens.contains(t)))
-  }
 
-  def matchesLC(tokens: Seq[String]): Seq[String] = {
-    tokens.filter(t => {
-      val r: Option[Boolean] = lexTokensLC.contains(t.toLowerCase)
-      r.getOrElse(false)
-    })
-
-  }*/
 }
