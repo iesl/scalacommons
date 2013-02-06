@@ -69,9 +69,7 @@ object DoubleIntervals extends GenericIntervals[Double]
 
 	def holesBySize[T](list: List[(Double, Double)]): List[(Double, Double)] =
 		{
-      list =  list.sortBy[Double]((x: (Double, Double)) => x._1 - x._2) // note reverse sort
-//		  invertIgnoreEdges(list).sortBy[Double]((x: (Double, Double)) => x._1 - x._2) // note reverse sort
-      invertIgnoreEdges(list)
+		  invertIgnoreEdges(list.sortBy[Double]((x: (Double, Double)) => x._1 - x._2)).sortBy[Double]((x: (Double, Double)) => x._1 - x._2) // note reverse sort
 		}
 
 	implicit def tupleToInterval(t: (Double, Double)): Interval[java.lang.Double] =
@@ -125,9 +123,7 @@ object FloatIntervals extends GenericIntervals[Float]
 
 	def holesBySize(list: List[(Float, Float)]): List[(Float, Float)] =
 		{
-      list = list.sortBy[Float]((x: (Float, Float)) => x._1 - x._2) // note reverse sort
-//		  invertIgnoreEdges(list).sortBy[Float]((x: (Float, Float)) => x._1 - x._2) // note reverse sort
-      invertIgnoreEdges(list)
+		  invertIgnoreEdges(list.sortBy[Float]((x: (Float, Float)) => x._1 - x._2)).sortBy[Float]((x: (Float, Float)) => x._1 - x._2) // note reverse sort
 		}
 
 	implicit def tupleToInterval(t: (Float, Float)): Interval[java.lang.Float] =
