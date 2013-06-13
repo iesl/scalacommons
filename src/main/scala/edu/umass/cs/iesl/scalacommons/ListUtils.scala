@@ -62,8 +62,7 @@ object ListUtils
 	def split[T](l: List[T])(p: T => Boolean): List[List[T]] =
 		l.headOption.map
 		{
-		x => val (h, t) = l.span
-		                  {p}; h :: split(t)(p)
+		x => val (h, t) = l.span {p}; h :: split(t)(p)
 		}.getOrElse(Nil)
 
 	def groupContiguousSimilar[T](similar: (T, T) => Boolean)(l: List[T]): List[List[T]] =

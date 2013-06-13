@@ -1,51 +1,45 @@
 package edu.umass.cs.iesl.scalacommons
 
 //http://michid.wordpress.com/2009/02/23/function_mem/
-class Memoize1[-T, +R](f: T => R) extends (T => R)
-	{
+class Memoize1[-T, +R](f: T => R) extends (T => R) {
 
-	import scala.collection.mutable
+  import scala.collection.mutable
 
-	protected[this] val vals = mutable.Map.empty[T, R]
+  protected[this] val vals = mutable.Map.empty[T, R]
 
-	def apply(x: T): R =
-		{
-		if (vals.contains(x))
-			{
-			vals(x)
-			}
-		else
-			{
-			val y = f(x)
-			vals += ((x, y))
-			y
-			}
-		}
-	}
+  def apply(x: T): R = synchronized {
+    if (vals.contains(x)) {
+      vals(x)
+    }
+    else {
+      val y = f(x)
+      vals += ((x, y))
+      y
+    }
+  }
+}
+object Memoize1 {
+  def apply[T, R](f: T => R) = new Memoize1(f)
 
-object Memoize1
-	{
-	def apply[T, R](f: T => R) = new Memoize1(f)
+  def Y[T, R](f: (T, T => R) => R) = {
+    var yf: T => R = null
+    yf = Memoize1(f(_, yf(_)))
+    yf
+  }
+}
 
-	def Y[T, R](f: (T, T => R) => R) =
-		{
-		var yf: T => R = null
-		yf = Memoize1(f(_, yf(_)))
-		yf
-		}
-	}
+class InvalidatableMemoize1[-T, +R](f: T => R) extends Memoize1[T, R](f) {
+  def remove(x: T) = synchronized { vals.remove(x) }
 
-class InvalidatableMemoize1[-T, +R](f: T => R) extends Memoize1[T, R](f)
-	{
-	def remove(x: T) = vals.remove(x)
+   def clear() { synchronized {
+    vals.clear()
+  }}
+}
 
-	def clear() { vals.clear() }
-	}
+object InvalidatableMemoize1 {
+  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f)
+}
 
-object InvalidatableMemoize1
-	{
-	def apply[T, R](f: T => R) = new InvalidatableMemoize1(f)
-	}
 /*
 class ConditionalMemoize1[-T, +R](f: T => R, condition: R => Boolean) extends (T => R)
 	{
