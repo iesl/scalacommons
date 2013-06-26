@@ -123,7 +123,7 @@ class RichString(val s: String) extends Logging {
   def isMixedCase: Boolean = containsLowerCase && containsUpperCase
 }
 
-case class NonemptyString(s: String) {
+case class NonemptyString(s: String) extends Ordered[NonemptyString] {
   require(s.nonEmpty, "Expected non-empty String")
 
   override def toString = s
@@ -137,4 +137,5 @@ case class NonemptyString(s: String) {
 
 
   //def +(that:NonemptyString) = new NonemptyString(s + that.s)
+  def compare(that: NonemptyString) = s.compare(that.s)
 }
