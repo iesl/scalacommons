@@ -5,6 +5,7 @@ class Memoize1[-T, +R](f: T => R) extends (T => R) {
 
   import scala.collection.mutable
 
+  // todo use scala 2.10 threadsafe map
   protected[this] val vals = mutable.Map.empty[T, R]
 
   def apply(x: T): R = synchronized {
@@ -18,6 +19,7 @@ class Memoize1[-T, +R](f: T => R) extends (T => R) {
     }
   }
 }
+
 object Memoize1 {
   def apply[T, R](f: T => R) = new Memoize1(f)
 
@@ -29,11 +31,20 @@ object Memoize1 {
 }
 
 class InvalidatableMemoize1[-T, +R](f: T => R) extends Memoize1[T, R](f) {
-  def remove(x: T) = synchronized { vals.remove(x) }
+  def remove(x: T) = synchronized {
+    vals.remove(x)
+  }
 
-   def clear() { synchronized {
-    vals.clear()
-  }}
+  def force(x: T, y: R) = synchronized {
+    vals += ((x, y))
+    y
+  }
+
+  def clear() {
+    synchronized {
+      vals.clear()
+    }
+  }
 }
 
 object InvalidatableMemoize1 {
