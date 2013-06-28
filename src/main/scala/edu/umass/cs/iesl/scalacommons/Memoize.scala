@@ -18,9 +18,13 @@ class Memoize1[-T, +R](f: T => R) extends (T => R) {
       y
     }
   }
-  
+
   // don't call this "contains" since that could mislead re the contents of an underlying collection
-  def isCached(x:T) = vals.contains(x)
+  def isCached(x: T) = vals.contains(x)
+
+  def getCached(x: T): Option[R] = synchronized {
+    vals.get(x)
+  }
 }
 
 object Memoize1 {
@@ -49,7 +53,7 @@ object InvalidatableMemoize1 {
   def apply[T, R](f: T => R) = new InvalidatableMemoize1(f)
 }
 
-trait Forceable[-T, R] extends InvalidatableMemoize1[T,R] {
+trait Forceable[-T, R] extends InvalidatableMemoize1[T, R] {
   def force(x: T, y: R) = synchronized {
     vals += ((x, y))
     y
@@ -57,7 +61,7 @@ trait Forceable[-T, R] extends InvalidatableMemoize1[T,R] {
 }
 
 object ForceableMemoize1 {
-  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable[T,R]
+  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable[T, R]
 }
 
 /*
