@@ -1,20 +1,28 @@
 package edu.umass.cs.iesl.scalacommons
 
 //http://michid.wordpress.com/2009/02/23/function_mem/
-class Memoize1[-T, +R](f: T => R) extends (T => R) {
+
+/**
+ * Memoize a function that return Options, but do not memoize if the function return None
+ * @param f
+ * @tparam T
+ * @tparam R
+ */
+
+class OptionMemoize1[-T, +R](f: T => Option[R]) extends (T => Option[R]) {
 
   import scala.collection.mutable
 
   // todo use scala 2.10 threadsafe map
   protected[this] val vals = mutable.Map.empty[T, R]
 
-  def apply(x: T): R = synchronized {
+  def apply(x: T): Option[R] = synchronized {
     if (vals.contains(x)) {
-      vals(x)
+      Some(vals(x))
     }
     else {
       val y = f(x)
-      vals += ((x, y))
+      y.map(yy => vals += ((x, yy)))
       y
     }
   }
@@ -27,8 +35,8 @@ class Memoize1[-T, +R](f: T => R) extends (T => R) {
   }
 }
 
-object Memoize1 {
-  def apply[T, R](f: T => R) = new Memoize1(f)
+object OptionMemoize1 {
+  def apply[T, R](f: T => Option[R]) = new OptionMemoize1(f)
 
   def Y[T, R](f: (T, T => R) => R) = {
     var yf: T => R = null
@@ -37,7 +45,7 @@ object Memoize1 {
   }
 }
 
-class InvalidatableMemoize1[-T, +R](f: T => R) extends Memoize1[T, R](f) {
+class InvalidatableOptionMemoize1[-T, +R](f: T => Option[R]) extends OptionMemoize1[T, R](f) {
   def remove(x: T) = synchronized {
     vals.remove(x)
   }
@@ -49,19 +57,19 @@ class InvalidatableMemoize1[-T, +R](f: T => R) extends Memoize1[T, R](f) {
   }
 }
 
-object InvalidatableMemoize1 {
-  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f)
+object InvalidatableOptionMemoize1 {
+  def apply[T, R](f: T =>  Option[R]) = new InvalidatableOptionMemoize1(f)
 }
 
-trait Forceable[-T, R] extends InvalidatableMemoize1[T, R] {
+trait OptionForceable[-T, R] extends InvalidatableOptionMemoize1[T, R] {
   def force(x: T, y: R) = synchronized {
     vals += ((x, y))
     y
   }
 }
 
-object ForceableMemoize1 {
-  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable[T, R]
+object ForceableOptionMemoize1 {
+  def apply[T, R](f: T => Option[R]) = new InvalidatableOptionMemoize1(f) with OptionForceable[T, R]
 }
 
 
