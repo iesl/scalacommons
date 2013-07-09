@@ -4,7 +4,7 @@ import edu.umass.cs.iesl.sbtbase.IeslProject._
 
 object ScalaCommonsBuild extends Build {
 
-  val vers = "0.1-SNAPSHOT"
+  val vers = "0.2-SNAPSHOT"
 
   implicit val allDeps: Dependencies = new Dependencies(); //(CleanLogging.excludeLoggers)  // doesn't work?
 
@@ -17,8 +17,8 @@ object ScalaCommonsBuild extends Build {
     scalaCompiler(),
     scalatest(),
     specs2(),
-    scalaIoCore("0.4.0"),
-    scalaIoFile("0.4.0"),
+    scalaIoCore("0.4.2"),
+    scalaIoFile("0.4.2"),
     "com.typesafe" % "config" % "latest.release", // TODO allDeps.typesafeConfig(),
     jdom("1.1.3"),
     mavenCobertura(),

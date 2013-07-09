@@ -14,7 +14,7 @@ object Control {
       execute
     }
     catch {
-      case e => println(e); Left(errorMessagePrefix + e.toString)
+      case e:Throwable => println(e); Left(errorMessagePrefix + e.toString)
     }
   }
 
@@ -23,7 +23,7 @@ object Control {
       execute
     }
     catch {
-      case e => println(e); Left(errorMessagePrefix + e.toString)
+      case e:Throwable => println(e); Left(errorMessagePrefix + e.toString)
     }
     finally {
       trapAndLog()(doFinally)
@@ -35,7 +35,7 @@ object Control {
       execute
     }
     catch {
-      case e => println(e); Some(errorMessagePrefix + e.toString)
+      case e:Throwable => println(e); Some(errorMessagePrefix + e.toString)
     }
   }
 
@@ -44,7 +44,7 @@ object Control {
       execute
     }
     catch {
-      case e => println(e); Some(errorMessagePrefix + e.toString)
+      case e:Throwable => println(e); Some(errorMessagePrefix + e.toString)
     }
     finally {
       trapAndLog()(doFinally)
@@ -56,7 +56,7 @@ object Control {
       execute
     }
     catch {
-      case e: Exception => ()
+      case e:Throwable => ()
     }
   }
 
@@ -65,7 +65,7 @@ object Control {
       execute
     }
     catch {
-      case e => println(e); println(e.toString)
+      case e:Throwable => println(e); println(e.toString)
     }
   }
 
@@ -74,7 +74,7 @@ object Control {
       Right(t)
     }
     catch {
-      case e: Exception => Left(e)
+      case e:Exception => Left(e)
     }
   }
 
@@ -83,7 +83,7 @@ object Control {
       Right(t)
     }
     catch {
-      case e: Exception => println(e); Left(e.toString)
+      case e:Throwable => println(e); Left(e.toString)
     }
   }
 
