@@ -53,8 +53,8 @@ object XmlUtils {
         super.elemEnd(pos, pre, label)
       }
 
-      override def elem(pos: Int, pre: String, label: String, attrs: MetaData, pscope: NamespaceBinding, nodes: NodeSeq): NodeSeq = {
-        val node: Node = super.elem(pos, pre, label, attrs, pscope, nodes).head
+      override def elem(pos: Int, pre: String, label: String, attrs: MetaData, pscope: NamespaceBinding, empty: Boolean, nodes: NodeSeq): NodeSeq = {
+        val node: Node = super.elem(pos, pre, label, attrs, pscope, empty, nodes).head
         depth match {
           case 1 => <dummy/> // dummy final roll up
           case 2 => f(node); NodeSeq.Empty // process and discard first-level nodes
@@ -84,8 +84,8 @@ object XmlUtils {
         super.elemEnd(pos, pre, label)
       }
 
-      override def elem(pos: Int, pre: String, label: String, attrs: MetaData, pscope: NamespaceBinding, nodes: NodeSeq): NodeSeq = {
-        val node: Node = super.elem(pos, pre, label, attrs, pscope, nodes).head
+      override def elem(pos: Int, pre: String, label: String, attrs: MetaData, pscope: NamespaceBinding, empty: Boolean, nodes: NodeSeq): NodeSeq = {
+        val node: Node = super.elem(pos, pre, label, attrs, pscope, empty, nodes).head
         if (labels contains label) {
           f(node);
           if (depth == 1) <dummy/> else NodeSeq.Empty
