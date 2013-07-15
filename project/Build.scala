@@ -10,7 +10,7 @@ object ScalaCommonsBuild extends Build {
 
   import allDeps._
 
-  override def settings = super.settings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings
+  //override def settings = super.settings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings
   
   val deps = Seq(
     dsutils(),
