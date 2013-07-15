@@ -1,7 +1,7 @@
 package edu.umass.cs.iesl.scalacommons
 
 import java.util.regex.Pattern
-import com.weiglewilczek.slf4s.Logging
+import com.typesafe.scalalogging.slf4j.Logging
 
 object StringUtils {
   implicit def toOptionNonempty(s: String): Option[NonemptyString] = if (s.trim.isEmpty) None else Some(new NonemptyString(s.trim))

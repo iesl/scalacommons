@@ -9,7 +9,7 @@ import java.io.File
 import sys.SystemProperties
 import java.util.NoSuchElementException
 import org.clapper.classutil.{ClassInfo, ClassFinder}
-import com.weiglewilczek.slf4s.Logging
+import com.typesafe.scalalogging.slf4j.Logging
 import collection.immutable.List
 import tools.nsc.util.ScalaClassLoader.URLClassLoader
 

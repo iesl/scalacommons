@@ -3,7 +3,7 @@ package edu.umass.cs.iesl.scalacommons
 import scalax.io._
 import tools.nsc.io._
 import java.io.InputStream
-import com.weiglewilczek.slf4s.Logging
+import com.typesafe.scalalogging.slf4j.Logging
 import scala.util.Random
 
 /**

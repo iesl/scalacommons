@@ -2,8 +2,8 @@ package edu.umass.cs.iesl.scalacommons
 
 import java.io.InputStream
 import StringUtils._
-import com.weiglewilczek.slf4s.Logging
 import scala.util.matching.Regex
+import com.typesafe.scalalogging.slf4j.Logging
 
 /**
  * @author <a href="mailto:dev@davidsoergel.com">David Soergel</a>

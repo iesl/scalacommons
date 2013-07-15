@@ -10,13 +10,15 @@ object ScalaCommonsBuild extends Build {
 
   import allDeps._
 
+  override def settings = super.settings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings
+  
   val deps = Seq(
     dsutils(),
     commonsIo(),
     classutil(),
     scalaCompiler(),
     scalatest(),
-    specs2(),
+    specs2("2.1"),
     scalaIoCore("0.4.2"),
     scalaIoFile("0.4.2"),
     "com.typesafe" % "config" % "latest.release", // TODO allDeps.typesafeConfig(),
