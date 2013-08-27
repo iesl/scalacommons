@@ -20,7 +20,8 @@ object StringUtils {
   //def toTraversableNonempty2[B, That, Repr](ss: B)(implicit bf: CanBuildFrom[Repr, B, That]): That = {}
   // def flatMap[B, That](f: A => GenTraversableOnce[B])(implicit bf: CanBuildFrom[Repr, B, That]): That = {}
 
-  implicit def stringToOptionInt(s: String): Option[Int] = if (s.trim.isEmpty) None else Some(s.toInt)
+  // this interferes with toOptionNonempty
+  //implicit def stringToOptionInt(s: String): Option[Int] = if (s.trim.isEmpty) None else Some(s.toInt)
 
   implicit def enrichString(s: String): RichString = new RichString(s)
 

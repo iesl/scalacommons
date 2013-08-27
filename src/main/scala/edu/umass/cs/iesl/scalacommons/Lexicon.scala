@@ -37,11 +37,11 @@ class Lexicon(s: InputStream) extends Logging {
   }
 
   def countMatches(tokens: Seq[String]): Int = {
-    tokens.filter(lexTokens.contains(_)).length
+    tokens.count(lexTokens.contains)
   }
 
   def countMatchesLC(tokens: Seq[String]): Int = {
-    tokens.filter(s => lexTokensLC.contains(s.toLowerCase)).length
+    tokens.count(s => lexTokensLC.contains(s.toLowerCase))
   }
 
   // Maybe: consider newlines in the input to be a hard constraint, but strip the spaces within each line
@@ -61,7 +61,7 @@ class Lexicon(s: InputStream) extends Logging {
 
   def substringMatchesLC(s: String): Map[String, Int] = {
     val target = s.toLowerCase
-    val matchesPerToken = (for (r <- lexTokensStrippedLCREs) yield (r.toString, r.findAllIn(target).size)).filter(_._2 > 0).toMap
+    val matchesPerToken = (for (r <- lexTokensStrippedLCREs) yield (r.toString(), r.findAllIn(target).size)).filter(_._2 > 0).toMap
     matchesPerToken
   }
 
