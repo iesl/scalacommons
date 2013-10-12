@@ -2,11 +2,12 @@ import sbt._
 import edu.umass.cs.iesl.sbtbase.Dependencies
 import edu.umass.cs.iesl.sbtbase.IeslProject._
 
+
 object ScalaCommonsBuild extends Build {
 
   val vers = "0.2-SNAPSHOT"
 
-  implicit val allDeps: Dependencies = new Dependencies(); //(CleanLogging.excludeLoggers)  // doesn't work?
+  implicit val allDeps: Dependencies = new Dependencies();
 
   import allDeps._
 
@@ -14,6 +15,7 @@ object ScalaCommonsBuild extends Build {
   
   val deps = Seq(
     dsutils(),
+    scalatime(),
     commonsIo(),
     classutil(),
     scalaCompiler(),

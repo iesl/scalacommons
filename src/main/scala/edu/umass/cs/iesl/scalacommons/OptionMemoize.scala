@@ -61,6 +61,9 @@ object InvalidatableOptionMemoize1 {
   def apply[T, R](f: T =>  Option[R]) = new InvalidatableOptionMemoize1(f)
 }
 
+/**
+ * Normally the only way to memoize the result of a function is to compute it.  Here, we also allow just asserting that y=f(x).
+ */
 trait OptionForceable[-T, R] extends InvalidatableOptionMemoize1[T, R] {
   def force(x: T, y: R) = synchronized {
     vals += ((x, y))
@@ -68,6 +71,10 @@ trait OptionForceable[-T, R] extends InvalidatableOptionMemoize1[T, R] {
   }
 }
 
+/**
+ * Normally the only way to memoize the result of a function is to compute it.  Here, we also allow just asserting that y=f(x).
+ */
+ 
 object ForceableOptionMemoize1 {
   def apply[T, R](f: T => Option[R]) = new InvalidatableOptionMemoize1(f) with OptionForceable[T, R]
 }

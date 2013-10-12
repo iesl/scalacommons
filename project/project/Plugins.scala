@@ -3,9 +3,6 @@ import sbt.Keys._
 
 object IeslPluginLoader extends Build {
 
-  // automatically updating SNAPSHOTs does not seem to work right here.
-  // as a workaround, we'll just release every incremental change to iesl-sbt-base with integer build numbers.
-
   lazy val root = Project(id = "plugins", base = file("."))
     .settings(resolvers += "IESL Public Releases" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public")
     //.settings(resolvers += "IESL Public Snapshots" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public-snapshots")
