@@ -95,7 +95,7 @@ class PluginManager[B <: PluginManager.HasName](implicit man: Manifest[B]) exten
     def findPlugins(classes: Map[String, ClassInfo]): Map[String, T] = {
 
       //logger.warn("Finding " + baseTypeName + " in classpath: ")
-      val x = ClassFinder.concreteSubclasses(baseTypeName, classes ++ allClasses.get(baseTypeName).map(baseTypeName -> _)).toSeq
+      val x = ClassFinder.concreteSubclasses(baseTypeName, classes ++ allClasses.get(baseTypeName).map(baseTypeName -> _)).toList
 
       x.map((ci) => {
         val className: String = ci.name
