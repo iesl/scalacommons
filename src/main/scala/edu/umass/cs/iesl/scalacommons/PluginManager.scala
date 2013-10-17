@@ -12,6 +12,7 @@ import org.clapper.classutil.{ClassInfo, ClassFinder}
 import com.typesafe.scalalogging.slf4j.Logging
 import collection.immutable.List
 import tools.nsc.util.ScalaClassLoader.URLClassLoader
+import scala.annotation.tailrec
 
 // originally informed by from http://thoughts.inphina.com/2011/09/15/building-a-plugin-based-architecture-in-scala/
 /**
@@ -65,6 +66,7 @@ class PluginManager[B <: PluginManager.HasName](implicit man: Manifest[B]) exten
     allClassMap
   }
 
+  /*
   private lazy val filteredClasses = {
     //logger.warn("Finding " + pluginBaseName + " in classpath: ")
     val x = ClassFinder.concreteSubclasses(pluginBaseName, allClasses) ++ allClasses.get(pluginBaseName)
@@ -80,8 +82,19 @@ class PluginManager[B <: PluginManager.HasName](implicit man: Manifest[B]) exten
     //logger.warn(result.map(_.toString()).mkString("\n"))
     result
   }
+  */
 
-  def findPlugins[T](implicit man: Manifest[T]): Map[String, T] = new SingleTypePluginManager[T].findPlugins(filteredClasses)
+  def findPlugins[T](implicit man: Manifest[T]): Map[String, T] = new SingleTypePluginManager[T].findPlugins
+
+  def concreteSubclasses(ancestor: String, classes: Map[String, ClassInfo]): Iterable[ClassInfo] = allSubclasses(ancestor,classes.values).filter(_.isConcrete)
+  
+  //@tailrec
+  def allSubclasses(ancestor: String, classes:Iterable[ClassInfo]): Iterable[ClassInfo] = {
+    val direct = classes.filter(x => x.superClassName == ancestor || x.implements(ancestor))
+    val indirect = direct.flatMap(x=>allSubclasses(x.name,classes))
+    direct ++ indirect
+  }
+  //(filteredClasses)
 
   //def findPlugins[T](): Map[String, T] = Map()
   private class SingleTypePluginManager[T](implicit man: Manifest[T]) {
@@ -92,31 +105,55 @@ class PluginManager[B <: PluginManager.HasName](implicit man: Manifest[B]) exten
      * @param classes
      * @return
      */
-    def findPlugins(classes: Map[String, ClassInfo]): Map[String, T] = {
+    val findPlugins: Map[String, T] = {
+      //(classes: Map[String, ClassInfo])
 
       //logger.warn("Finding " + baseTypeName + " in classpath: ")
-      val x = ClassFinder.concreteSubclasses(baseTypeName, classes ++ allClasses.get(baseTypeName).map(baseTypeName -> _)).toList
+      /*
+      val x = allClasses.collect({
+        case (n, ci) if ci.interfaces.contains(baseTypeName) && ci.isConcrete => ci
+      })
+      */
+
+      //val x = ClassFinder.concreteSubclasses(baseTypeName, classes ++ allClasses.get(baseTypeName).map(baseTypeName -> _)).toList
+
+      // horribly inefficient because it doesn't memoize properly
+      //val x = ClassFinder.concreteSubclasses(baseTypeName, allClasses).toList
+      
+      val x = concreteSubclasses(baseTypeName, allClasses)
 
       x.map((ci) => {
         val className: String = ci.name
 
-        val comp: T = companion(className)
-        //logger.warn("Found: " + className + " -> " + comp.toString)
-        val pluginName = if (comp.isInstanceOf[PluginManager.HasName]) comp.asInstanceOf[PluginManager.HasName].name else className
-        (pluginName -> comp)
-      }).toMap
+        val compo: Option[T] = companion(className)
+        val result = compo map {
+          comp =>
+          //logger.warn("Found: " + className + " -> " + comp.toString)
+           // val pluginName = if (comp.isInstanceOf[PluginManager.HasName]) comp.asInstanceOf[PluginManager.HasName].name else className
+          
+          val pluginName = try { comp.asInstanceOf[PluginManager.HasName].name} catch {case e: NoSuchMethodException => className}
+          
+            (pluginName -> comp)
+        }
+        result
+      }).flatten.toMap
     }
 
     class Bogus {}
 
-    val classloader = new URLClassLoader(classpathFiles.map(_.toURI.toURL), classOf[Bogus].getClassLoader)
+    lazy val classloader = new URLClassLoader(classpathFiles.map(_.toURI.toURL), classOf[Bogus].getClassLoader)
     //logger.warn("Built classloader: " + classloader.getURLs.mkString("\n"))
 
-    private def companion(name: String): T = {
+    private def companion(name: String): Option[T] = {
       val classname: String = if (name.endsWith("$")) name else (name + "$")
       //logger.warn("Loading class " + classname)
 
-      classloader.loadClass(classname).getField("MODULE$").get(man.erasure).asInstanceOf[T]
+      try {
+        Some(classloader.loadClass(classname).getField("MODULE$").get(man.erasure).asInstanceOf[T])
+      }
+      catch {
+        case e: ClassNotFoundException => None
+      }
     }
   }
 
