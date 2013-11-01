@@ -1,19 +1,67 @@
 package edu.umass.cs.iesl.scalacommons
 
 import scala.collection.concurrent.TrieMap
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 //http://michid.wordpress.com/2009/02/23/function_mem/
 class Memoize1[-T, +R](f: T => R) extends (T => R) {
 
+  val rwLock = new ReentrantReadWriteLock(true)
+  val rLock = rwLock.readLock()
+  val wLock = rwLock.writeLock()
+
   protected[this] val vals = TrieMap.empty[T, R] // mutable.Map.empty[T, R] with concurrent.map[T,R]
 
-  def apply(x: T): R = vals.getOrElseUpdate(x,f(x))
+  def acceptResultForCaching(y: R) = true
+
+  def apply(x: T): R = {
+    // argh: TrieMap claims to be threadsafe, yet getOrElseUpdate is totally vulnerable to race conditions.
+    // vals.getOrElseUpdate(x,f(x))
+
+    rLock.lock()
+    try {
+      vals.get(x).getOrElse({
+        // do the expensive part outside of the write lock.
+
+        // todo: keep track of which computations are underway.
+        // else there is a small risk of computing f(x) redundantly.
+        // That could just waste time, but could also cause trouble if it has side effects.
+
+        val y = f(x)
+
+        if (acceptResultForCaching(y)) {
+          wLock.lock()
+          try {
+            // if we computed f(x) redundantly, just retain whichever result won the race
+            if (!vals.contains(x)) {
+              vals += ((x, y))
+            }
+          }
+          finally {
+            wLock.unlock()
+          }
+
+          // if we computed f(x) redundantly, return the result that is actually in the cache
+          vals(x)
+        }
+        else y
+      })
+
+    } finally {
+      rLock.unlock()
+    }
+
+  }
 
   // don't call this "contains" since that could mislead re the contents of an underlying collection
   def isCached(x: T) = vals.contains(x)
 
   def getCached(x: T): Option[R] = vals.get(x)
-  
+
+}
+
+trait DropNone[-T, +R] extends Memoize1[T, Option[R]] {
+  override def acceptResultForCaching(y: Option[R]) = y.isDefined
 }
 
 object Memoize1 {
@@ -28,7 +76,10 @@ object Memoize1 {
 
 class InvalidatableMemoize1[-T, +R](f: T => R) extends Memoize1[T, R](f) {
   def remove(x: T) = vals.remove(x)
-  def clear() { vals.clear() }
+
+  def clear() {
+    vals.clear()
+  }
 }
 
 object InvalidatableMemoize1 {
@@ -36,13 +87,12 @@ object InvalidatableMemoize1 {
 }
 
 trait Forceable1[-T, R] extends InvalidatableMemoize1[T, R] {
-  def force(x: T, y: R) = vals.update(x,y)
+  def force(x: T, y: R) = vals.update(x, y)
 }
 
 object ForceableMemoize1 {
   def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable1[T, R]
 }
-
 
 
 /*
@@ -106,16 +156,18 @@ object RecursiveMemoizedFunction
 */
 
 
-// Memoize0 stuff can be accomplished with just a var; be super explicit here for the sake of consistent API
+// Memoize0 stuff can be accomplished with just a var or lazy val; be super explicit here for the sake of consistent API
 
-class Memoize0[+R](f: () => R) extends (() => R) {
+class Memoize0[+R](f: => R) extends (() => R) {
 
+  // this solution doesn't allow clearing
+  lazy val cache = f
 
-  protected[this] var it : Option[R] = None
+  protected[this] var it: Option[R] = None
 
   def apply(): R = synchronized {
     it.getOrElse({
-      val y = f()
+      val y = f
       it = Some(y)
       y
     })
@@ -123,7 +175,7 @@ class Memoize0[+R](f: () => R) extends (() => R) {
 
   // don't call this "contains" since that could mislead re the contents of an underlying collection
   def isCached() = it.isDefined
-  
+
   def getCached(): Option[R] = it
 }
 
@@ -132,11 +184,11 @@ object Memoize0 {
 
 }
 
-class InvalidatableMemoize0[+R](f: () => R) extends Memoize0[R](f) {
-  
+class InvalidatableMemoize0[+R](f: => R) extends Memoize0[R](f) {
+
   def clear() {
     synchronized {
-     it = None
+      it = None
     }
   }
 }
@@ -145,8 +197,8 @@ object InvalidatableMemoize0 {
   def apply[R](f: () => R) = new InvalidatableMemoize0(f)
 }
 
-trait Forceable0[ R] extends InvalidatableMemoize0[R] {
-  def force( y: R) = synchronized {
+trait Forceable0[R] extends InvalidatableMemoize0[R] {
+  def force(y: R) = synchronized {
     it = Some(y)
     y
   }

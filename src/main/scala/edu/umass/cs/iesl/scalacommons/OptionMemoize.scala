@@ -1,13 +1,20 @@
 package edu.umass.cs.iesl.scalacommons
 
-//http://michid.wordpress.com/2009/02/23/function_mem/
 
+
+
+// obsoleted by Memoize1 with DropNone
+
+//http://michid.wordpress.com/2009/02/23/function_mem/
+/*
 /**
  * Memoize a function that return Options, but do not memoize if the function return None
  * @param f
  * @tparam T
  * @tparam R
  */
+
+
 
 class OptionMemoize1[-T, +R](f: T => Option[R]) extends (T => Option[R]) {
 
@@ -34,6 +41,22 @@ class OptionMemoize1[-T, +R](f: T => Option[R]) extends (T => Option[R]) {
     vals.get(x)
   }
 }
+
+
+class OptionMemoize1[-T, +R](f: T => Option[R]) extends (T => Option[R]) {
+
+  protected[this] val vals = TrieMap.empty[T, R] // mutable.Map.empty[T, R] with concurrent.map[T,R]
+
+  def apply(x: T): R = vals.getOrElseUpdate(x,f(x))
+
+  // don't call this "contains" since that could mislead re the contents of an underlying collection
+  def isCached(x: T) = vals.contains(x)
+
+  def getCached(x: T): Option[R] = vals.get(x)
+
+}
+
+
 
 object OptionMemoize1 {
   def apply[T, R](f: T => Option[R]) = new OptionMemoize1(f)
@@ -79,7 +102,7 @@ object ForceableOptionMemoize1 {
   def apply[T, R](f: T => Option[R]) = new InvalidatableOptionMemoize1(f) with OptionForceable[T, R]
 }
 
-
+*/
 
 /*
 class ConditionalMemoize1[-T, +R](f: T => R, condition: R => Boolean) extends (T => R)
