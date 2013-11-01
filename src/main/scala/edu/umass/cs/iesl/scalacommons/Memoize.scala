@@ -4,7 +4,19 @@ import scala.collection.concurrent.TrieMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
 //http://michid.wordpress.com/2009/02/23/function_mem/
-class Memoize1[-T, +R](f: T => R) extends (T => R) {
+
+//class Memoize1[-T, +R](_f: T => R) extends AbstractMemoize1(_f,_=>true)
+
+//abstract class AbstractMemoize1[-T, +R](f: T => R, acceptResultForCaching: R => Boolean) extends (T => R) {
+
+/**
+ * 
+ * @param f
+ * @tparam T  The input to the function
+ * @tparam R  The generic output of the function (supporting covariance) 
+ * @tparam Q  The actual output of the function (supporting acceptResultForCaching)
+ */
+class Memoize1[-T, +R, Q <: R](f: T => Q) extends (T => R) {
 
   val rwLock = new ReentrantReadWriteLock(true)
   val rLock = rwLock.readLock()
@@ -12,7 +24,7 @@ class Memoize1[-T, +R](f: T => R) extends (T => R) {
 
   protected[this] val vals = TrieMap.empty[T, R] // mutable.Map.empty[T, R] with concurrent.map[T,R]
 
-  def acceptResultForCaching(y: R) = true
+  def acceptResultForCaching(y: Q) = true
 
   def apply(x: T): R = {
     // argh: TrieMap claims to be threadsafe, yet getOrElseUpdate is totally vulnerable to race conditions.
@@ -60,8 +72,11 @@ class Memoize1[-T, +R](f: T => R) extends (T => R) {
 
 }
 
-trait DropNone[-T, +R] extends Memoize1[T, Option[R]] {
-  override def acceptResultForCaching(y: Option[R]) = y.isDefined
+
+//class OptionMemoize1[-T, +R](_f: T => R) extends AbstractMemoize1(_f,_=>true)
+
+trait DropNone[-T, +R, Q <: R] extends Memoize1[T, Option[R], Option[Q]] {
+  override def acceptResultForCaching(y: Option[Q]) = y.isDefined
 }
 
 object Memoize1 {
@@ -74,7 +89,7 @@ object Memoize1 {
   }
 }
 
-class InvalidatableMemoize1[-T, +R](f: T => R) extends Memoize1[T, R](f) {
+class InvalidatableMemoize1[-T, +R, Q <: R](f: T => Q) extends Memoize1[T, R, Q](f) {
   def remove(x: T) = vals.remove(x)
 
   def clear() {
@@ -86,12 +101,12 @@ object InvalidatableMemoize1 {
   def apply[T, R](f: T => R) = new InvalidatableMemoize1(f)
 }
 
-trait Forceable1[-T, R] extends InvalidatableMemoize1[T, R] {
+trait Forceable1[-T, R, Q <: R] extends InvalidatableMemoize1[T, R, Q] {
   def force(x: T, y: R) = vals.update(x, y)
 }
 
 object ForceableMemoize1 {
-  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable1[T, R]
+  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable1[T, R,R ]
 }
 
 
@@ -205,6 +220,6 @@ trait Forceable0[R] extends InvalidatableMemoize0[R] {
 }
 
 object ForceableMemoize0 {
-  def apply[R](f: () => R) = new InvalidatableMemoize0(f) with Forceable0[R]
+  def apply[R](f: => R) = new InvalidatableMemoize0[R](f) with Forceable0[R] {}
 }
 
