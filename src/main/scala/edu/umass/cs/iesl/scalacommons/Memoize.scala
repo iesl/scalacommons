@@ -1,30 +1,19 @@
 package edu.umass.cs.iesl.scalacommons
 
+import scala.collection.concurrent.TrieMap
+
 //http://michid.wordpress.com/2009/02/23/function_mem/
 class Memoize1[-T, +R](f: T => R) extends (T => R) {
 
-  import scala.collection.mutable
+  protected[this] val vals = TrieMap.empty[T, R] // mutable.Map.empty[T, R] with concurrent.map[T,R]
 
-  // todo use scala 2.10 threadsafe map
-  protected[this] val vals = mutable.Map.empty[T, R]
-
-  def apply(x: T): R = synchronized {
-    if (vals.contains(x)) {
-      vals(x)
-    }
-    else {
-      val y = f(x)
-      vals += ((x, y))
-      y
-    }
-  }
+  def apply(x: T): R = vals.getOrElseUpdate(x,f(x))
 
   // don't call this "contains" since that could mislead re the contents of an underlying collection
   def isCached(x: T) = vals.contains(x)
 
-  def getCached(x: T): Option[R] = synchronized {
-    vals.get(x)
-  }
+  def getCached(x: T): Option[R] = vals.get(x)
+  
 }
 
 object Memoize1 {
@@ -38,30 +27,20 @@ object Memoize1 {
 }
 
 class InvalidatableMemoize1[-T, +R](f: T => R) extends Memoize1[T, R](f) {
-  def remove(x: T) = synchronized {
-    vals.remove(x)
-  }
-
-  def clear() {
-    synchronized {
-      vals.clear()
-    }
-  }
+  def remove(x: T) = vals.remove(x)
+  def clear() { vals.clear() }
 }
 
 object InvalidatableMemoize1 {
   def apply[T, R](f: T => R) = new InvalidatableMemoize1(f)
 }
 
-trait Forceable[-T, R] extends InvalidatableMemoize1[T, R] {
-  def force(x: T, y: R) = synchronized {
-    vals += ((x, y))
-    y
-  }
+trait Forceable1[-T, R] extends InvalidatableMemoize1[T, R] {
+  def force(x: T, y: R) = vals.update(x,y)
 }
 
 object ForceableMemoize1 {
-  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable[T, R]
+  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable1[T, R]
 }
 
 
@@ -125,3 +104,55 @@ object RecursiveMemoizedFunction
 	}
   }
 */
+
+
+// Memoize0 stuff can be accomplished with just a var; be super explicit here for the sake of consistent API
+
+class Memoize0[+R](f: () => R) extends (() => R) {
+
+
+  protected[this] var it : Option[R] = None
+
+  def apply(): R = synchronized {
+    it.getOrElse({
+      val y = f()
+      it = Some(y)
+      y
+    })
+  }
+
+  // don't call this "contains" since that could mislead re the contents of an underlying collection
+  def isCached() = it.isDefined
+  
+  def getCached(): Option[R] = it
+}
+
+object Memoize0 {
+  def apply[R](f: () => R) = new Memoize0(f)
+
+}
+
+class InvalidatableMemoize0[+R](f: () => R) extends Memoize0[R](f) {
+  
+  def clear() {
+    synchronized {
+     it = None
+    }
+  }
+}
+
+object InvalidatableMemoize0 {
+  def apply[R](f: () => R) = new InvalidatableMemoize0(f)
+}
+
+trait Forceable0[ R] extends InvalidatableMemoize0[R] {
+  def force( y: R) = synchronized {
+    it = Some(y)
+    y
+  }
+}
+
+object ForceableMemoize0 {
+  def apply[R](f: () => R) = new InvalidatableMemoize0(f) with Forceable0[R]
+}
+
