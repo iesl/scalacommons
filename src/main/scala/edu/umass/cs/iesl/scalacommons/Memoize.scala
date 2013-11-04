@@ -2,6 +2,7 @@ package edu.umass.cs.iesl.scalacommons
 
 import scala.collection.concurrent.TrieMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.UUID
 
 //http://michid.wordpress.com/2009/02/23/function_mem/
 
@@ -77,6 +78,9 @@ class Memoize1[-T, +R, Q <: R](f: T => Q) extends (T => R) {
 
 trait DropNone[-T, +R, Q <: R] extends Memoize1[T, Option[R], Option[Q]] {
   override def acceptResultForCaching(y: Option[Q]) = y.isDefined
+  
+  // since we're not caching None, we know that a None response from the cache means the underlying store was just checked.
+  def getFlat(x:T):Option[R] = getCached(x).getOrElse(None)  //  flatten
 }
 
 object Memoize1 {
@@ -109,6 +113,9 @@ object ForceableMemoize1 {
   def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable1[T, R,R ]
 }
 
+class InvalidatableForceableOptionMemoize1[T,R](f: T => Option[R]) extends InvalidatableMemoize1[T, Option[R], Option[R]](f) with DropNone with Forceable1[UUID, Option[R], Option[R]] {
+  
+}
 
 /*
 class ConditionalMemoize1[-T, +R](f: T => R, condition: R => Boolean) extends (T => R)
