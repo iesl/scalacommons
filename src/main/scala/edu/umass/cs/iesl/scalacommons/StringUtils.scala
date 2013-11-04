@@ -83,18 +83,22 @@ class RichString(val s: String) extends Logging {
 
   def firstLine = {
     // surely there is a more idiomatic solution?
-    val i : Int = s.indexOf("\n") 
+    val i: Int = s.indexOf("\n")
     i match {
       case -1 => s
       case _ => limit(i)
     }
   }
-  
+
   def limitAtWhitespace(len: Int, suffixIfLimited: String) = {
     val l = limit(len + 1) // allow for a space after the last retained word
     if (l.length < s.length) {
-      val r = l.substring(0, l.lastIndexOf(" "))
-      (r + suffixIfLimited)
+      val i = l.lastIndexOf(" ")
+      if (i >= 0) {
+        val r = l.substring(0, i)
+        (r + suffixIfLimited)
+      }
+      else l + suffixIfLimited
     } else s
 
   }
