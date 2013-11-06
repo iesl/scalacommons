@@ -2,7 +2,6 @@ package edu.umass.cs.iesl.scalacommons
 
 import scala.collection.concurrent.TrieMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
-import java.util.UUID
 
 //http://michid.wordpress.com/2009/02/23/function_mem/
 
@@ -11,7 +10,7 @@ import java.util.UUID
 //abstract class AbstractMemoize1[-T, +R](f: T => R, acceptResultForCaching: R => Boolean) extends (T => R) {
 
 /**
- * 
+ *
  * @param f
  * @tparam T  The input to the function
  * @tparam R  The generic output of the function (supporting covariance) 
@@ -27,6 +26,9 @@ class Memoize1[-T, +R, Q <: R](f: T => Q) extends (T => R) {
 
   def acceptResultForCaching(y: Q) = true
 
+
+  // this doesn't work because a read lock can't be upgraded to a write lock.
+  /*
   def apply(x: T): R = {
     // argh: TrieMap claims to be threadsafe, yet getOrElseUpdate is totally vulnerable to race conditions.
     // vals.getOrElseUpdate(x,f(x))
@@ -65,6 +67,52 @@ class Memoize1[-T, +R, Q <: R](f: T => Q) extends (T => R) {
     }
 
   }
+  */
+
+  // simple version
+  /*
+  def apply(x: T): R = synchronized {
+    if (vals.contains(x)) {
+      vals(x)
+    }
+    else {
+      val y = f(x)
+      vals += ((x, y))
+      y
+    }
+  }
+  */
+
+  def apply(x: T): R = synchronized {
+    rLock.lock()
+    val c = try {
+      vals.get(x)
+    } finally {
+      rLock.unlock()
+    }
+
+    val result = c.getOrElse({
+
+      // expensive part is outside the write lock
+      val y = f(x)
+
+      if (acceptResultForCaching(y)) {
+        wLock.lock()
+        try {
+          // check the cache again to make sure nobody else wrote it in the meantime
+          vals.get(x).getOrElse({
+            vals += ((x, y))
+            y
+          })
+        } finally {
+          wLock.unlock()
+        }
+      }
+      else y
+    })
+    result
+  }
+
 
   // don't call this "contains" since that could mislead re the contents of an underlying collection
   def isCached(x: T) = vals.contains(x)
@@ -78,9 +126,9 @@ class Memoize1[-T, +R, Q <: R](f: T => Q) extends (T => R) {
 
 trait DropNone[-T, +R, Q <: R] extends Memoize1[T, Option[R], Option[Q]] {
   override def acceptResultForCaching(y: Option[Q]) = y.isDefined
-  
+
   // since we're not caching None, we know that a None response from the cache means the underlying store was just checked.
-  def getFlat(x:T):Option[R] = getCached(x).getOrElse(None)  //  flatten
+  def getFlat(x: T): Option[R] = getCached(x).getOrElse(None) //  flatten
 }
 
 object Memoize1 {
@@ -106,16 +154,19 @@ object InvalidatableMemoize1 {
 }
 
 trait Forceable1[-T, R, Q <: R] extends InvalidatableMemoize1[T, R, Q] {
-  def force(x: T, y: R) = vals.update(x, y)
+  def force(x: T, y: R): Unit = vals.update(x, y)
 }
 
 object ForceableMemoize1 {
-  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable1[T, R,R ]
+  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable1[T, R, R]
 }
 
-class InvalidatableForceableOptionMemoize1[T,R](f: T => Option[R]) extends InvalidatableMemoize1[T, Option[R], Option[R]](f) with DropNone with Forceable1[UUID, Option[R], Option[R]] {
-  
+
+class InvalidatableForceableOptionMemoize1[T, R](f: T => Option[R]) extends InvalidatableMemoize1[T, Option[R], Option[R]](f) with DropNone[T, R, R] with Forceable1[T, Option[R], Option[R]] {
+  def forceFlat(x: T, y: R): Unit = force(x, Some(y))
 }
+
+//class test extends InvalidatableMemoize1[UUID, Option[T], Option[T]] with DropNone[UUID, T, T] with Forceable1[UUID, Option[T], Option[T]]
 
 /*
 class ConditionalMemoize1[-T, +R](f: T => R, condition: R => Boolean) extends (T => R)
