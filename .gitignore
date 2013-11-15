@@ -17,6 +17,10 @@ class
 log
 *.cache
 unpack
+*-tmp
+tmp-*
+
+.sbtopts
 
 ## CVS & SVN
 CVS
@@ -49,3 +53,26 @@ project/boot/
 
 
 
+# General temp files
+.DS_Store
+*.ser
+*.pyc
+
+# Files related to Play build or usage
+target
+logs
+
+
+# IDE and editors
+*~
+.idea
+nbproject
+eclipse
+.amateras
+.settings
+.classpath
+.project
+*.iml
+*.ipr
+*.iws
+.ensime*
