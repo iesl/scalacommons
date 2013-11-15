@@ -281,3 +281,35 @@ object ForceableMemoize0 {
   def apply[R](f: => R) = new InvalidatableMemoize0[R](f) with Forceable0[R] {}
 }
 
+class Memoize2[-S, -T, +R, Q <: R](f: (S,T) => Q) extends Memoize1[(S,T),R,Q]((x:(S,T))=>f(x._1,x._2)) {
+  def apply(q:S,x: T): R = super.apply((q,x))
+}
+
+object Memoize2 {
+  def apply[S, T, R](f: (S,T) => R) = new Memoize2(f)
+}
+
+class InvalidatableMemoize2[-S, -T, +R, Q <: R](f: (S,T) => Q) extends Memoize2[S, T, R, Q](f) {
+  def remove(q:S,x: T) = vals.remove((q,x))
+
+  def clear() {
+    vals.clear()
+  }
+}
+
+object InvalidatableMemoize2 {
+  def apply[S, T, R](f: (S,T) => R) = new InvalidatableMemoize2(f)
+}
+
+trait Forceable2[-S, -T, R, Q <: R] extends InvalidatableMemoize2[S, T, R, Q] {
+  def force(q:S, x: T, y: R): Unit = vals.update((q,x), y)
+}
+
+object ForceableMemoize2 {
+  def apply[S, T, R](f: (S,T) => R) = new InvalidatableMemoize2(f) with Forceable2[S, T, R, R]
+}
+
+
+class InvalidatableForceableOptionMemoize2[S, T, R](f: (S,T) => Option[R]) extends InvalidatableMemoize2[S, T, Option[R], Option[R]](f) with DropNone[(S,T), R, R] with Forceable2[S, T, Option[R], Option[R]] {
+  def forceFlat(q:S, x: T, y: R): Unit = force(q, x, Some(y))
+}
