@@ -2,88 +2,73 @@ package edu.umass.cs.iesl.scalacommons
 
 import scala.collection.concurrent.TrieMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import scala.collection.mutable
+import scala.collection.parallel.mutable.ParTrieMap
 
 //http://michid.wordpress.com/2009/02/23/function_mem/
 
-//class Memoize1[-T, +R](_f: T => R) extends AbstractMemoize1(_f,_=>true)
+/**
+ * the minimal functions needed to support a cache; a subset of mutable.MapLike.  The point is that we can make an
+ * EhCache implementation without having to fully implement mutable.Map, because that would be overkill
+ * (see https://github.com/vinaynair/EhCacheAsScalaMap)
+ * @tparam T
+ * @tparam R
+ */
+trait BasicMutableMap[T,R] {
+  def update(key: T, value: R): Unit
 
-//abstract class AbstractMemoize1[-T, +R](f: T => R, acceptResultForCaching: R => Boolean) extends (T => R) {
+  def clear() : Unit
+
+  def remove(value: T)
+
+  def get(value: T): Option[R]
+
+  //def contains(value: T):Boolean
+}
+
+trait Memoize1[-T, +R, Q <: R] extends (T => R) {
+
+  val f: T=>Q
+
+  protected[this] def vals: BasicMutableMap[T,R]
+
+  // don't call this "contains" since that could mislead re the contents of an underlying collection
+  //def isCached(x: T) = vals.contains(x)
+
+  def getCached(x: T): Option[R] = vals.get(x)
+
+  def acceptResultForCaching(y: Q) = true
+
+  def apply(x: T): R
+}
+
+trait ParTrieMapMemoize1 [T, R, Q <: R] extends Memoize1[T,R,Q]{
+  //new ParTrieMap[T,R]() with BasicMutableMap[T,R] //TrieMap.empty[T, R]  // mutable.Map.empty[T, R] with concurrent.map[T,R]
+  private val m = ParTrieMap.empty[T,R]
+  
+  protected[this] val vals = new BasicMutableMap[T,R] {
+    def clear() = m.clear
+    //def contains(value: T) = m.contains(value)
+    def get(value: T) = m.get(value)
+    def remove(value: T) = m.remove(value)
+    def update(key: T, value: R) = m.update(key,value)
+  }
+}
 
 /**
  *
- * @param f
  * @tparam T  The input to the function
  * @tparam R  The generic output of the function (supporting covariance) 
  * @tparam Q  The actual output of the function (supporting acceptResultForCaching)
  */
-class Memoize1[-T, +R, Q <: R](f: T => Q) extends (T => R) {
+trait RWLockingMemoize1[-T, +R, Q <: R] extends (T => R) with Memoize1[T,R,Q] {
 
   val rwLock = new ReentrantReadWriteLock(true)
   val rLock = rwLock.readLock()
   val wLock = rwLock.writeLock()
 
-  protected[this] val vals = TrieMap.empty[T, R] // mutable.Map.empty[T, R] with concurrent.map[T,R]
-
-  def acceptResultForCaching(y: Q) = true
-
-
-  // this doesn't work because a read lock can't be upgraded to a write lock.
-  /*
-  def apply(x: T): R = {
-    // argh: TrieMap claims to be threadsafe, yet getOrElseUpdate is totally vulnerable to race conditions.
-    // vals.getOrElseUpdate(x,f(x))
-
-    rLock.lock()
-    try {
-      vals.get(x).getOrElse({
-        // do the expensive part outside of the write lock.
-
-        // todo: keep track of which computations are underway.
-        // else there is a small risk of computing f(x) redundantly.
-        // That could just waste time, but could also cause trouble if it has side effects.
-
-        val y = f(x)
-
-        if (acceptResultForCaching(y)) {
-          wLock.lock()
-          try {
-            // if we computed f(x) redundantly, just retain whichever result won the race
-            if (!vals.contains(x)) {
-              vals += ((x, y))
-            }
-          }
-          finally {
-            wLock.unlock()
-          }
-
-          // if we computed f(x) redundantly, return the result that is actually in the cache
-          vals(x)
-        }
-        else y
-      })
-
-    } finally {
-      rLock.unlock()
-    }
-
-  }
-  */
-
-  // simple version
-  /*
-  def apply(x: T): R = synchronized {
-    if (vals.contains(x)) {
-      vals(x)
-    }
-    else {
-      val y = f(x)
-      vals += ((x, y))
-      y
-    }
-  }
-  */
-
-  def apply(x: T): R = synchronized {
+ 
+  override def apply(x: T): R =  {
     rLock.lock()
     val c = try {
       vals.get(x)
@@ -101,7 +86,7 @@ class Memoize1[-T, +R, Q <: R](f: T => Q) extends (T => R) {
         try {
           // check the cache again to make sure nobody else wrote it in the meantime
           vals.get(x).getOrElse({
-            vals += ((x, y))
+            vals.update(x, y)
             y
           })
         } finally {
@@ -113,11 +98,6 @@ class Memoize1[-T, +R, Q <: R](f: T => Q) extends (T => R) {
     result
   }
 
-
-  // don't call this "contains" since that could mislead re the contents of an underlying collection
-  def isCached(x: T) = vals.contains(x)
-
-  def getCached(x: T): Option[R] = vals.get(x)
 
 }
 
@@ -132,7 +112,9 @@ trait DropNone[-T, +R, Q <: R] extends Memoize1[T, Option[R], Option[Q]] {
 }
 
 object Memoize1 {
-  def apply[T, R](f: T => R) = new Memoize1(f)
+  def apply[T, R](_f: T => R) = new RWLockingMemoize1[T,R,R] with ParTrieMapMemoize1[T,R,R] {
+    val f = _f
+  }
 
   def Y[T, R](f: (T, T => R) => R) = {
     var yf: T => R = null
@@ -141,16 +123,20 @@ object Memoize1 {
   }
 }
 
-class InvalidatableMemoize1[-T, +R, Q <: R](f: T => Q) extends Memoize1[T, R, Q](f) {
-  def remove(x: T) = vals.remove(x)
 
+trait InvalidatableMemoize1[-T, +R, Q <: R] extends Memoize1[T, R, Q] {
+  def remove(x: T) = vals.remove(x)
+  
   def clear() {
     vals.clear()
   }
+  
 }
 
 object InvalidatableMemoize1 {
-  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f)
+  def apply[T, R](_f: T => R) = new RWLockingMemoize1[T,R,R]  with ParTrieMapMemoize1[T,R,R] with InvalidatableMemoize1[T,R,R] {
+    val f = _f
+  } 
 }
 
 trait Forceable1[-T, R, Q <: R] extends InvalidatableMemoize1[T, R, Q] {
@@ -158,12 +144,21 @@ trait Forceable1[-T, R, Q <: R] extends InvalidatableMemoize1[T, R, Q] {
 }
 
 object ForceableMemoize1 {
-  def apply[T, R](f: T => R) = new InvalidatableMemoize1(f) with Forceable1[T, R, R]
+  def apply[T, R](_f: T => R) = new RWLockingMemoize1[T,R,R]  with ParTrieMapMemoize1[T,R,R] with InvalidatableMemoize1[T,R,R]  with Forceable1[T, R, R]{
+    val f = _f
+  }
 }
 
 
-class InvalidatableForceableOptionMemoize1[T, R](f: T => Option[R]) extends InvalidatableMemoize1[T, Option[R], Option[R]](f) with DropNone[T, R, R] with Forceable1[T, Option[R], Option[R]] {
+trait InvalidatableForceableOptionMemoize1[T, R] extends InvalidatableMemoize1[T, Option[R], Option[R]] with DropNone[T, R, R] with Forceable1[T, Option[R], Option[R]] {
   def forceFlat(x: T, y: R): Unit = force(x, Some(y))
+}
+
+
+object InvalidatableForceableOptionMemoize1 {
+  def apply[T, R](_f: T => Option[R]) = new RWLockingMemoize1[T,Option[R],Option[R]]  with ParTrieMapMemoize1[T,Option[R],Option[R]] with InvalidatableForceableOptionMemoize1[T,R] {
+    val f = _f
+  }
 }
 
 //class test extends InvalidatableMemoize1[UUID, Option[T], Option[T]] with DropNone[UUID, T, T] with Forceable1[UUID, Option[T], Option[T]]
@@ -229,10 +224,11 @@ object RecursiveMemoizedFunction
 */
 
 
-// Memoize0 stuff can be accomplished with just a var or lazy val; be super explicit here for the sake of consistent API
+// Memoize0 stuff can be accomplished with just a var or lazy val; we're just super explicit here for the sake of consistent API
 
-class Memoize0[+R](f: => R) extends (() => R) {
-
+trait Memoize0[+R] extends (() => R) {
+  val f: ()=>R
+  
   // this solution doesn't allow clearing
   lazy val cache = f
 
@@ -240,7 +236,7 @@ class Memoize0[+R](f: => R) extends (() => R) {
 
   def apply(): R = synchronized {
     it.getOrElse({
-      val y = f
+      val y = f()
       it = Some(y)
       y
     })
@@ -253,11 +249,11 @@ class Memoize0[+R](f: => R) extends (() => R) {
 }
 
 object Memoize0 {
-  def apply[R](f: () => R) = new Memoize0(f)
+  def apply[R](_f: () => R) = new Memoize0[R] { val f = _f }
 
 }
 
-class InvalidatableMemoize0[+R](f: => R) extends Memoize0[R](f) {
+trait InvalidatableMemoize0[+R] extends Memoize0[R] {
 
   def clear() {
     synchronized {
@@ -267,7 +263,7 @@ class InvalidatableMemoize0[+R](f: => R) extends Memoize0[R](f) {
 }
 
 object InvalidatableMemoize0 {
-  def apply[R](f: () => R) = new InvalidatableMemoize0(f)
+  def apply[R](_f: () => R) = new InvalidatableMemoize0[R] { val f = _f }
 }
 
 trait Forceable0[R] extends InvalidatableMemoize0[R] {
@@ -278,18 +274,23 @@ trait Forceable0[R] extends InvalidatableMemoize0[R] {
 }
 
 object ForceableMemoize0 {
-  def apply[R](f: => R) = new InvalidatableMemoize0[R](f) with Forceable0[R] {}
+  def apply[R](_f: () => R) = new InvalidatableMemoize0[R] with Forceable0[R]  { val f = _f }
 }
 
-class Memoize2[-S, -T, +R, Q <: R](f: (S,T) => Q) extends Memoize1[(S,T),R,Q]((x:(S,T))=>f(x._1,x._2)) {
-  def apply(q:S,x: T): R = super.apply((q,x))
+trait Memoize2[-S, -T, +R, Q <: R] extends Memoize1[(S,T),R,Q] {
+  
+  val g: (S,T) => Q
+  
+  final val f = (x:(S,T))=>g(x._1,x._2)
+  
+  def apply(q:S,x: T): R = apply((q,x))
 }
 
 object Memoize2 {
-  def apply[S, T, R](f: (S,T) => R) = new Memoize2(f)
+  def apply[S, T, R](_g: (S,T) => R) = new RWLockingMemoize1[(S,T),R,R]  with ParTrieMapMemoize1[(S,T),R,R] with Memoize2[S,T,R,R] { val g = _g }
 }
 
-class InvalidatableMemoize2[-S, -T, +R, Q <: R](f: (S,T) => Q) extends Memoize2[S, T, R, Q](f) {
+trait InvalidatableMemoize2[-S, -T, +R, Q <: R] extends Memoize2[S, T, R, Q] {
   def remove(q:S,x: T) = vals.remove((q,x))
 
   def clear() {
@@ -298,7 +299,7 @@ class InvalidatableMemoize2[-S, -T, +R, Q <: R](f: (S,T) => Q) extends Memoize2[
 }
 
 object InvalidatableMemoize2 {
-  def apply[S, T, R](f: (S,T) => R) = new InvalidatableMemoize2(f)
+  def apply[S, T, R](_g: (S,T) => R) =  new RWLockingMemoize1[(S,T),R,R]  with ParTrieMapMemoize1[(S,T),R,R]with InvalidatableMemoize2[S,T,R,R] { val g = _g }
 }
 
 trait Forceable2[-S, -T, R, Q <: R] extends InvalidatableMemoize2[S, T, R, Q] {
@@ -306,10 +307,14 @@ trait Forceable2[-S, -T, R, Q <: R] extends InvalidatableMemoize2[S, T, R, Q] {
 }
 
 object ForceableMemoize2 {
-  def apply[S, T, R](f: (S,T) => R) = new InvalidatableMemoize2(f) with Forceable2[S, T, R, R]
+  def apply[S, T, R](_g: (S,T) => R) =  new RWLockingMemoize1[(S,T),R,R]  with ParTrieMapMemoize1[(S,T),R,R]with Forceable2[S,T,R,R] { val g = _g }
 }
 
 
-class InvalidatableForceableOptionMemoize2[S, T, R](f: (S,T) => Option[R]) extends InvalidatableMemoize2[S, T, Option[R], Option[R]](f) with DropNone[(S,T), R, R] with Forceable2[S, T, Option[R], Option[R]] {
+trait InvalidatableForceableOptionMemoize2[S, T, R] extends InvalidatableMemoize2[S, T, Option[R], Option[R]] with DropNone[(S,T), R, R] with Forceable2[S, T, Option[R], Option[R]] {
   def forceFlat(q:S, x: T, y: R): Unit = force(q, x, Some(y))
+}
+
+object InvalidatableForceableOptionMemoize2 {
+  def apply[S, T, R](_g: (S,T) => Option[R]) =  new RWLockingMemoize1[(S,T),Option[R],Option[R]] with ParTrieMapMemoize1[(S,T),Option[R],Option[R]] with InvalidatableForceableOptionMemoize2[S, T, R] { val g = _g }
 }
