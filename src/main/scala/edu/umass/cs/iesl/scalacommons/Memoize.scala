@@ -1,8 +1,6 @@
 package edu.umass.cs.iesl.scalacommons
 
-import scala.collection.concurrent.TrieMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
-import scala.collection.mutable
 import scala.collection.parallel.mutable.ParTrieMap
 
 //http://michid.wordpress.com/2009/02/23/function_mem/
@@ -18,6 +16,9 @@ trait BasicMutableMap[T,R] {
   def update(key: T, value: R): Unit
 
   def clear() : Unit
+  
+  // an optimization for our weird shared Ehcache situation, so we can clear multiple subcaches without retrieving the keys each time
+  // def clear(allKeys: GenIterable[_] ) : Unit = clear()
 
   def remove(value: T)
 
@@ -227,7 +228,7 @@ object RecursiveMemoizedFunction
 // Memoize0 stuff can be accomplished with just a var or lazy val; we're just super explicit here for the sake of consistent API
 
 trait Memoize0[+R] extends (() => R) {
-  val f: ()=>R
+  val f: Unit=>R
   
   // this solution doesn't allow clearing
   lazy val cache = f
@@ -249,7 +250,7 @@ trait Memoize0[+R] extends (() => R) {
 }
 
 object Memoize0 {
-  def apply[R](_f: () => R) = new Memoize0[R] { val f = _f }
+  def apply[R](_f: Unit => R) = new Memoize0[R] { val f = _f }
 
 }
 
@@ -263,7 +264,7 @@ trait InvalidatableMemoize0[+R] extends Memoize0[R] {
 }
 
 object InvalidatableMemoize0 {
-  def apply[R](_f: () => R) = new InvalidatableMemoize0[R] { val f = _f }
+  def apply[R](_f: Unit => R) = new InvalidatableMemoize0[R] { val f = _f }
 }
 
 trait Forceable0[R] extends InvalidatableMemoize0[R] {
@@ -274,7 +275,7 @@ trait Forceable0[R] extends InvalidatableMemoize0[R] {
 }
 
 object ForceableMemoize0 {
-  def apply[R](_f: () => R) = new InvalidatableMemoize0[R] with Forceable0[R]  { val f = _f }
+  def apply[R](_f: Unit => R) = new InvalidatableMemoize0[R] with Forceable0[R]  { val f = _f }
 }
 
 trait Memoize2[-S, -T, +R, Q <: R] extends Memoize1[(S,T),R,Q] {
