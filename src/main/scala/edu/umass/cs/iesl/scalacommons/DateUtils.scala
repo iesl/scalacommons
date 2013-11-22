@@ -50,29 +50,30 @@ object DateUtils {
 
   def formatInterval(x: Option[DateTime], y: Option[DateTime]): String = {
 
-    val yearOnlyFormat = DateTimeFormat.forPattern("yyyy")
-    val monthAndYearFormat = DateTimeFormat.forPattern("MMM yyyy")
-    val yearformat = DateTimeFormat.forPattern("dd MMM yyyy")
-    val monthformat = DateTimeFormat.forPattern("dd MMM")
+    val yearFormat = DateTimeFormat.forPattern("yyyy")
+    //val monthAndYearFormat = DateTimeFormat.forPattern("MMM yyyy")
+    val fullFormat = DateTimeFormat.forPattern("MMM dd, yyyy")
+    //val monthformat = DateTimeFormat.forPattern("dd MMM")
+    val monthformat = DateTimeFormat.forPattern("MMM")
     val dayformat = DateTimeFormat.forPattern("dd")
 
     (x, y) match {
       case (None, None) => ""
-      case (Some(x), None) => yearformat.print(x)
-      case (None, Some(y)) => yearformat.print(y)
+      case (Some(x), None) => fullFormat.print(x)
+      case (None, Some(y)) => fullFormat.print(y)
       case (Some(x), Some(y)) => {
-        if (x == y) yearformat.print(x)
+        if (x == y) fullFormat.print(x)
         else {
           if (x.year != y.year) {
-            yearformat.print(x) + " - " + yearformat.print(y)
+            fullFormat.print(x) + " - " + fullFormat.print(y)
           }
           else if (x.monthOfYear() != y.monthOfYear()) {
-            monthformat.print(x) + " - " + monthformat.print(y) + ", " + yearOnlyFormat.print(x)
+           monthformat.print(x) + " " +  dayformat.print(x) + " - " + monthformat.print(y) + " " +  dayformat.print(y) + ", " + yearFormat.print(x)
           }
           else if (x.dayOfMonth() != y.dayOfMonth()) {
-            dayformat.print(x) + " - " + dayformat.print(y) + ", " + monthAndYearFormat.print(x)
+            monthformat.print(x) + " " + dayformat.print(x) + " - " + dayformat.print(y) + ", " + yearFormat.print(x)
           }
-          else yearformat.print(x)
+          else fullFormat.print(x)
         }
       }
     }
