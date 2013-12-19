@@ -226,7 +226,7 @@ object RecursiveMemoizedFunction
 
 
 // Memoize0 stuff can be accomplished with just a var or lazy val; we're just super explicit here for the sake of consistent API
-
+// TODO: this shouldn't be Unit=>R, but rather ()=>R or just =>R
 trait Memoize0[+R] extends (() => R) {
   val f: Unit=>R
   
@@ -237,7 +237,7 @@ trait Memoize0[+R] extends (() => R) {
 
   def apply(): R = synchronized {
     it.getOrElse({
-      val y = f()
+      val y = f(())
       it = Some(y)
       y
     })
