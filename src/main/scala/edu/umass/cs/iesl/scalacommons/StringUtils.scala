@@ -18,7 +18,7 @@ object StringUtils {
   //implicit def toTraversableNonempty[T <: Traversable[String]](ss: T): T[NonemptyString] = ss.flatMap(toOptionNonempty)
 
   //def toTraversableNonempty2[B, That, Repr](ss: B)(implicit bf: CanBuildFrom[Repr, B, That]): That = {}
-  // def flatMap[B, That](f: A => GenTraversableOnce[B])(implicit bf: CanBuildFrom[Repr, B, That]): That = {}
+  // def flatMap[B, That](f: A => TraversableOnce[B])(implicit bf: CanBuildFrom[Repr, B, That]): That = {}
 
   // this interferes with toOptionNonempty
   //implicit def stringToOptionInt(s: String): Option[Int] = if (s.trim.isEmpty) None else Some(s.toInt)

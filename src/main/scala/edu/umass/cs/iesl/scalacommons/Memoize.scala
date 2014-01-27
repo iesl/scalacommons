@@ -18,7 +18,7 @@ trait BasicMutableMap[T,R] {
   def clear() : Unit
   
   // an optimization for our weird shared Ehcache situation, so we can clear multiple subcaches without retrieving the keys each time
-  // def clear(allKeys: GenIterable[_] ) : Unit = clear()
+  // def clear(allKeys: Iterable[_] ) : Unit = clear()
 
   def remove(value: T)
 

@@ -1,7 +1,7 @@
 package edu.umass.cs.iesl.scalacommons
 
 import com.typesafe.scalalogging.slf4j.Logging
-import collection.{GenSet, GenIterable, GenTraversable}
+import collection.{Set, Iterable, Traversable}
 import annotation.tailrec
 
 /**
@@ -10,9 +10,9 @@ import annotation.tailrec
  */
 object SeqUtils extends Logging {
 
-  implicit def emptyCollectionToNone[T <: GenTraversable[Any]](s: T): Option[T] = if (s.isEmpty) None else Some(s)
+  implicit def emptyCollectionToNone[T <: Traversable[Any]](s: T): Option[T] = if (s.isEmpty) None else Some(s)
 
-  def mergeWarn[T, This <: GenTraversable[T]](a: This, b: This): This = {
+  def mergeWarn[T, This <: Traversable[T]](a: This, b: This): This = {
     (a, b) match {
       case (Nil, Nil) => a
       case (p, Nil) => a
@@ -26,7 +26,7 @@ object SeqUtils extends Logging {
     }
   }
 
-  def mergeOrFail[T, This <: GenTraversable[T]](a: This, b: This): This = {
+  def mergeOrFail[T, This <: Traversable[T]](a: This, b: This): This = {
     (a, b) match {
       case (Nil, Nil) => a
       case (p, Nil) => a
@@ -43,9 +43,9 @@ object SeqUtils extends Logging {
   // based on Daniel Sobral.  http://stackoverflow.com/questions/3050557/how-can-i-extend-scala-collections-with-an-argmax-method
   // but that had serious issues!  Rewritten...
 
-  def argMax[A, B: Ordering](input: GenIterable[A], f: A => B): GenSet[A] = argMaxZip(input, f) map (_._1) toSet
+  def argMax[A, B: Ordering](input: Iterable[A], f: A => B): Set[A] = argMaxZip(input, f) map (_._1) toSet
 
-  def argMaxZip[A, B: Ordering](input: GenIterable[A], f: A => B): GenIterable[(A, B)] = {
+  def argMaxZip[A, B: Ordering](input: Iterable[A], f: A => B): Iterable[(A, B)] = {
     if (input.isEmpty) Nil
     else {
       val fPairs = input map (x => (x, f(x)))
@@ -56,10 +56,10 @@ object SeqUtils extends Logging {
 
   // trouble using Ordering.reverse, so just cut and paste for now
 
-  def argMin[A, B: Ordering](input: GenIterable[A], f: A => B): GenSet[A] = argMinZip(input, f) map (_._1) toSet
+  def argMin[A, B: Ordering](input: Iterable[A], f: A => B): Set[A] = argMinZip(input, f) map (_._1) toSet
 
 
-  def argMinZip[A, B: Ordering](input: GenIterable[A], f: A => B): GenIterable[(A, B)] = {
+  def argMinZip[A, B: Ordering](input: Iterable[A], f: A => B): Iterable[(A, B)] = {
     if (input.isEmpty) Nil
     else {
       val fPairs = input map (x => (x, f(x)))
@@ -102,9 +102,9 @@ object SeqUtils extends Logging {
    * also this is easier to
    */
 
-  def normalFoldLeft[B, A](z: B)(input: GenTraversable[A])(op: (B, A) => B): B = {
+  def normalFoldLeft[B, A](z: B)(input: Traversable[A])(op: (B, A) => B): B = {
     {
-      def f(bb: B, in: GenTraversable[A]): (B, GenTraversable[A]) = (op(z, in.head), in.tail)
+      def f(bb: B, in: Traversable[A]): (B, Traversable[A]) = (op(z, in.head), in.tail)
       filterFoldLeft(z, input, f)
     }
   }
