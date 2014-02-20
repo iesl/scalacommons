@@ -11,8 +11,6 @@ object ScalaCommonsBuild extends Build {
 
   import allDeps._
 
-  //override def settings = super.settings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings
-  
   val deps = Seq(
     dsutils(),
     scalatime(),
@@ -22,11 +20,12 @@ object ScalaCommonsBuild extends Build {
     scalatest(),
     specs2("2.1"),
     scalaIoCore("0.4.2"),
-    scalaIoFile("0.4.2"),
-    "com.typesafe" % "config" % "latest.release", // TODO allDeps.typesafeConfig(),
-    jdom("1.1.3"),
-    mavenCobertura(),
-    mavenFindbugs())
+    "com.typesafe" % "config" % "latest.release", 
+    jdom("1.1.3")
+    // scalaIoFile("0.4.2"),
+    // mavenCobertura(),
+    // mavenFindbugs()
+  )
 
   lazy val scalacommons = Project("scalacommons", file(".")).ieslSetup(vers, deps, Public).cleanLogging.standardLogging
 
