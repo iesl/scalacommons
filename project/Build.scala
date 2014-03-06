@@ -14,7 +14,7 @@ object ScalaCommonsBuild extends Build {
   val deps = Seq(
     dsutils(),
     scalatime(),
-    commonsIo(),
+    "commons-io" % "commons-io" % "2.4",
     classutil(),
     scalaCompiler(),
     scalatest(),
