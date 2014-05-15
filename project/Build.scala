@@ -22,9 +22,6 @@ object ScalaCommonsBuild extends Build {
     scalaIoCore("0.4.2"),
     "com.typesafe" % "config" % "latest.release", 
     jdom("1.1.3")
-    // scalaIoFile("0.4.2"),
-    // mavenCobertura(),
-    // mavenFindbugs()
   )
 
   lazy val scalacommons = Project("scalacommons", file(".")).ieslSetup(vers, deps, Public).cleanLogging.standardLogging

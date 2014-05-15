@@ -48,21 +48,20 @@ class PluginManager[B <: PluginManager.HasName](implicit man: Manifest[B]) exten
     }
 
     val extraClasses = {
-      try { {
+      try {
         if (!classpathFiles.isEmpty) {
           val finder = ClassFinder(classpathFiles)
-          finder.getClasses
+          val asdf = finder.getClasses
+          asdf
         }
-        else List[ClassInfo]()
-      }
-      }
-      catch {
-        case e: NoSuchElementException => List[ClassInfo]()
+        else Stream[ClassInfo]()
+      } catch {
+        case e: NoSuchElementException => Stream[ClassInfo]()
       }
     }
 
     val classes = ClassFinder(classpath.toSeq).getClasses() ++ extraClasses
-    val allClassMap = ClassFinder.classInfoMap(classes)
+    val allClassMap = ClassFinder.classInfoMap(classes.toIterator)
     allClassMap
   }
 
@@ -98,7 +97,7 @@ class PluginManager[B <: PluginManager.HasName](implicit man: Manifest[B]) exten
 
   //def findPlugins[T](): Map[String, T] = Map()
   private class SingleTypePluginManager[T](implicit man: Manifest[T]) {
-    val baseTypeName = man.erasure.getName
+    val baseTypeName = man.runtimeClass.getName
 
     /**
      * Returns a map from plugin names to plugins.  If the plugin has a "name" member, it is used; otherwise the class name is used.
@@ -149,7 +148,7 @@ class PluginManager[B <: PluginManager.HasName](implicit man: Manifest[B]) exten
       //logger.warn("Loading class " + classname)
 
       try {
-        Some(classloader.loadClass(classname).getField("MODULE$").get(man.erasure).asInstanceOf[T])
+        Some(classloader.loadClass(classname).getField("MODULE$").get(man.runtimeClass).asInstanceOf[T])
       }
       catch {
         case e: ClassNotFoundException => None
