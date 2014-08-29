@@ -3,7 +3,7 @@ package edu.umass.cs.iesl.scalacommons
 import java.io.InputStream
 import StringUtils._
 import scala.util.matching.Regex
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.{StrictLogging => Logging}
 
 /**
  * @author <a href="mailto:dev@davidsoergel.com">David Soergel</a>

@@ -1,6 +1,6 @@
 package edu.umass.cs.iesl.scalacommons
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.{StrictLogging => Logging}
 import collection.{Set, Iterable, Traversable}
 import annotation.tailrec
 

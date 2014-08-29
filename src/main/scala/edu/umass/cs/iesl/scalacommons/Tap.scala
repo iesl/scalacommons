@@ -1,6 +1,7 @@
 package edu.umass.cs.iesl.scalacommons
 
-import com.typesafe.scalalogging.slf4j.{Logger, Logging}
+import com.typesafe.scalalogging.{StrictLogging => Logging}
+import com.typesafe.scalalogging.Logger
 
 
 // http://stackoverflow.com/questions/17571800/avoiding-the-variable-in-val-x-foo-barx-x

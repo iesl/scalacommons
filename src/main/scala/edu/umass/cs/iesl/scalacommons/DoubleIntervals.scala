@@ -129,8 +129,7 @@ object FloatIntervals extends GenericIntervals[Float] {
    * @param intervals
    * @return
    */
-  def union(intervals: Seq[(Float, Float)]): List[(Float, Float)] =
-    {
+  def union(intervals: Seq[(Float, Float)]): List[(Float, Float)] = {
       val i: Seq[Interval[java.lang.Float]] = intervals.map(tupleToInterval)
       val u: MultiIntervalUnion[java.lang.Float] = new MultiIntervalUnion[java.lang.Float](JavaConversions.setAsJavaSet(i.toSet))
       val r = JavaConversions.asScalaIterator[Interval[java.lang.Float]](u.iterator()).toList
@@ -139,7 +138,7 @@ object FloatIntervals extends GenericIntervals[Float] {
 
   def isSortedNonOverlapping(tuples: List[(Float, Float)]): Boolean =
     {
-      val pairs = tuples.sliding(2)
+      val pairs = tuples.sliding(2).toList
       val bad = pairs.find(p => (p.tail.head.min > p.head.max)) ++ tuples.find(x => x._2 < x._1)
       bad.isEmpty
     }

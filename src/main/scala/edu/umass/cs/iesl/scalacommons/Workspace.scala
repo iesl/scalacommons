@@ -3,7 +3,7 @@ package edu.umass.cs.iesl.scalacommons
 import scalax.io._
 import tools.nsc.io._
 import java.io.InputStream
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.{StrictLogging => Logging}
 import scala.util.Random
 
 /**
@@ -50,12 +50,12 @@ class StreamWorkspace(val filename: String, instream: InputStream) extends Works
   }
 }
 
+
 class FileWorkspace(val jfile: java.io.File) extends Workspace with Logging {
   val file = File(jfile)
   val dir = {
     val d = TempDirFactory() //Directory.makeTemp()
-    logger.debug("Created FileWorkspace in " + d + " for " + file +
-      " " + d.isValid + " " + d.exists)
+    logger.debug(s"Created FileWorkspace in $d for $file  ${d.exists}")
     d
   }
 
