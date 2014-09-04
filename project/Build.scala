@@ -8,7 +8,7 @@ import edu.umass.cs.iesl.sbtbase.{IeslProject => Iesl, Config=>IeslConfig}
 
 object ScalaCommonsBuild extends Build {
 
-  val vers = "0.2-SNAPSHOT"
+  val vers = "0.3-SNAPSHOT"
 
   //implicit val allDeps: Dependencies = new Dependencies();
 
