@@ -8,7 +8,7 @@ import edu.umass.cs.iesl.sbtbase.{IeslProject => Iesl, Config=>IeslConfig}
 
 object ScalaCommonsBuild extends Build {
 
-  val vers = "0.3-SNAPSHOT"
+  // val vers = "0.3-SNAPSHOT"
 
   //implicit val allDeps: Dependencies = new Dependencies();
 
@@ -49,10 +49,22 @@ object ScalaCommonsBuild extends Build {
     
   )
 
+
+  def publishToIesl(vers: String, repotype: Iesl.RepoType): Option[Resolver] =  {
+    import Iesl._
+    import IeslConfig._
+    def repo(name: String) = name at nexusHttpsUrl + "/content/repositories/" + name
+    val isSnapshot = vers.endsWith("SNAPSHOT")
+    val isPrivate = if (repotype == Private) "private-" else ""
+    val repoName = isPrivate + (if (isSnapshot) "snapshots" else "releases")
+    Some(repo(repoName))
+  }
+
   // TODO undo this copypasta from iesl sbt base for deps, logging config
   lazy val scalacommons = Project("scalacommons", file("."))
   .settings(Iesl.scalaSettings(Iesl.DebugVars):_*)
-  .settings(Iesl.publishToIesl(vers, Iesl.Public), Iesl.creds)
+  .settings(publishTo := publishToIesl(version.value, Iesl.Public))
+  .settings(Iesl.creds)
   .settings(releaseSettings:_*)
   .settings(
     organization := IeslConfig.iesl,
