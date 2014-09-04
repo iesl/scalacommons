@@ -3,7 +3,7 @@ import Keys._
 import sbtrelease.ReleasePlugin._
 
 //import edu.umass.cs.iesl.sbtbase.Dependencies
-import edu.umass.cs.iesl.sbtbase.{IeslProject => Iesl}
+import edu.umass.cs.iesl.sbtbase.{IeslProject => Iesl, Config=>IeslConfig}
 
 
 object ScalaCommonsBuild extends Build {
@@ -55,7 +55,9 @@ object ScalaCommonsBuild extends Build {
   .settings(Iesl.publishToIesl(vers, Iesl.Public), Iesl.creds)
   .settings(releaseSettings:_*)
   .settings(
-    resolvers += "IESL Public Releases" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public",
+    organization := IeslConfig.iesl,
+    Iesl.setConflictStrategy(Iesl.ConflictStrict),
+    resolvers ++= (IeslConfig.IESLReleaseRepos ++ IeslConfig.IESLSnapshotRepos),
     scalaVersion := scalaV,
     crossScalaVersions := Seq("2.10.4", "2.11.2"),
     libraryDependencies ++= deps,
