@@ -40,7 +40,13 @@ object ScalaCommonsBuild extends Build {
     "org.slf4j"                     % "jcl-over-slf4j"       % "latest.release",
     "org.slf4j"                     % "log4j-over-slf4j"     % "latest.release",
     "org.slf4j"                     % "jul-to-slf4j"         % "latest.release",
-    "org.clapper"                   %% "grizzled-slf4j"      % "latest.release"
+    "org.clapper"                   %% "grizzled-slf4j"      % "latest.release",
+
+    // "junit" % "junit" % "latest.release" % "test",
+    "org.specs2" %% "specs2" % "2.4.1" % "test" ,
+    // "org.scalacheck" %% "scalacheck" % "latest.release" % "test" ,
+     "org.scalatest" %% "scalatest" % "latest.release" % "test"
+    
   )
 
   // TODO undo this copypasta from iesl sbt base for deps, logging config
