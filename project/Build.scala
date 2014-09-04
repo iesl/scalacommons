@@ -3,7 +3,7 @@ import Keys._
 import sbtrelease.ReleasePlugin._
 
 //import edu.umass.cs.iesl.sbtbase.Dependencies
-//import edu.umass.cs.iesl.sbtbase.IeslProject._
+import edu.umass.cs.iesl.sbtbase.{IeslProject => Iesl}
 
 
 object ScalaCommonsBuild extends Build {
@@ -45,19 +45,11 @@ object ScalaCommonsBuild extends Build {
 
   // TODO undo this copypasta from iesl sbt base for deps, logging config
   lazy val scalacommons = Project("scalacommons", file("."))
+  .settings(Iesl.scalaSettings(Iesl.DebugVars):_*)
   .settings(releaseSettings:_*)
   .settings(
     resolvers += "IESL Public Releases" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public",
-    scalaVersion := "2.11.2",
-    scalacOptions := Seq(
-      "-Xlint", "-deprecation", "-unchecked", "-Xcheckinit",
-      "-g:vars",
-      "-encoding", "utf8",
-      "-feature",
-      "-language:reflectiveCalls",
-      "-language:implicitConversions", "-language:postfixOps"
-    ),
-    javacOptions ++= Seq("-Xlint:unchecked", "-encoding", "utf8"),
+    scalaVersion := scalaV,
     crossScalaVersions := Seq("2.10.4", "2.11.2"),
     libraryDependencies ++= deps,
     libraryDependencies ++= (
