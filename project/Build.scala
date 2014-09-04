@@ -46,6 +46,7 @@ object ScalaCommonsBuild extends Build {
   // TODO undo this copypasta from iesl sbt base for deps, logging config
   lazy val scalacommons = Project("scalacommons", file("."))
   .settings(Iesl.scalaSettings(Iesl.DebugVars):_*)
+  .settings(Iesl.publishToIesl(vers, Iesl.Public), Iesl.creds)
   .settings(releaseSettings:_*)
   .settings(
     resolvers += "IESL Public Releases" at "https://dev-iesl.cs.umass.edu/nexus/content/groups/public",
