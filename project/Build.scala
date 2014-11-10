@@ -24,13 +24,13 @@ object ScalaCommonsBuild extends Build {
     "org.clapper" %% "classutil" % "latest.release",
     "org.scala-lang"                % "scala-compiler" % scalaV,
     "com.davidsoergel"              % "dsutils" % "1.05",
-    "org.specs2"                    %% "specs2" % "2.4.1" % "test",
     "commons-io"                    % "commons-io" % "2.4",
     "com.github.scala-incubator.io" %% "scala-io-core" % "latest.release",
     "com.github.scala-incubator.io" %% "scala-io-file" % "latest.release",
     "com.typesafe"                  % "config" % "latest.release",
     "org.jdom"                      % "jdom" % "1.1.3",
     "org.scala-lang.modules"        %% "scala-xml" % "1.0.1",
+
     "ch.qos.logback"                % "logback-classic"      % "latest.release",
     "ch.qos.logback"                % "logback-core"         % "latest.release",
     "org.slf4j"                     % "slf4j-api"            % "latest.release",
@@ -43,9 +43,8 @@ object ScalaCommonsBuild extends Build {
     "org.clapper"                   %% "grizzled-slf4j"      % "latest.release",
 
     // "junit" % "junit" % "latest.release" % "test",
-    "org.specs2" %% "specs2" % "2.4.1" % "test" ,
-    // "org.scalacheck" %% "scalacheck" % "latest.release" % "test" ,
-     "org.scalatest" %% "scalatest" % "latest.release" % "test"
+    "org.specs2"                    %% "specs2" % "2.4.1" % "test" ,
+    "org.scalatest"                 %% "scalatest" % "latest.release" % "test"
     
   )
 
