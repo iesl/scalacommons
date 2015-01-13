@@ -13,7 +13,7 @@ object ScalaCommonsBuild extends Build {
   //implicit val allDeps: Dependencies = new Dependencies();
 
   //import allDeps._
-  val scalaV = "2.11.2"
+  val scalaV = "2.11.4"
 
   val deps = Seq(
 
@@ -70,7 +70,7 @@ object ScalaCommonsBuild extends Build {
     Iesl.setConflictStrategy(Iesl.ConflictStrict),
     resolvers ++= (IeslConfig.IESLReleaseRepos ++ IeslConfig.IESLSnapshotRepos),
     scalaVersion := scalaV,
-    crossScalaVersions := Seq("2.10.4", "2.11.2"),
+    crossScalaVersions := Seq("2.10.4", "2.11.4"),
     libraryDependencies ++= deps,
     libraryDependencies ++= (
       if (scalaVersion.value.startsWith("2.10")) Nil
