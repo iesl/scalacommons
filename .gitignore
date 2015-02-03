@@ -1,6 +1,5 @@
 syntax: glob
 
-
 ## General temp files
 
 *.DS_Store
@@ -45,7 +44,6 @@ target/
 lib_managed/
 src_managed/
 project/boot/
-project/plugins.sbt
 project/build/target/
 project/plugins/project/
 project/plugins/target/
